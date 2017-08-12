@@ -1,22 +1,22 @@
 package main
 
 import (
-	"github.com/mch1307/go-domo/config"
-	"github.com/mch1307/go-domo/log"
-	"github.com/mch1307/go-domo/nhc"
-)
+	"fmt"
 
-// DomoConfig stores the app configuration
-var DomoConfig config.GlobalConfig
+	"github.com/mch1307/gomotics/config"
+
+	"github.com/mch1307/gomotics/log"
+	"github.com/mch1307/gomotics/nhc"
+)
 
 func main() {
 	log.Info("Starting")
 	go nhc.Listener()
 	var myCmd nhc.SimpleCmd
-	myCmd.Cmd = "executeactions"
-	myCmd.ID = 31
-	myCmd.Value = 0
-	_ = nhc.SendCommand(myCmd)
+	myCmd.Cmd = config.Conf.NhcConfig.GetEquipCmd
+
+	fmt.Println(config.Conf.NhcConfig.GetEquipCmd)
+	_ = nhc.SendCommand(myCmd.Stringify())
 
 	// Initialize internal db for storingNHC and Jeedom equipments
 	//db.NewStore()

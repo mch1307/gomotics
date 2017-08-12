@@ -43,6 +43,7 @@ func Listener() error {
 				log.Warn(err)
 				panic(err)
 			}
+			fmt.Println("json", nhcActions)
 		case "listlocations":
 			log.Info("listlocations")
 			err := json.Unmarshal(nhcMessage.Data, &nhcLocations)

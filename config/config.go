@@ -41,6 +41,17 @@ type GlobalConfig struct {
 	NhcConfig    NhcConf    `toml:"nhc"`
 }
 
+// Conf holds the global configuration
+var Conf GlobalConfig
+var err error
+
+func init() {
+	Conf, err = GetConf()
+	if err != nil {
+		panic(err)
+	}
+}
+
 // GetConf return the global app configuration from toml file
 func GetConf() (config GlobalConfig, err error) {
 	var cfg GlobalConfig

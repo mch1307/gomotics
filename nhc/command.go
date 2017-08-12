@@ -32,12 +32,12 @@ func ConnectNhc() (conn *net.TCPConn, err error) {
 }
 
 // SendCommand send passed command to nhc
-func SendCommand(cmd SimpleCmd) error {
+func SendCommand(cmd string) error {
 	conn, err := ConnectNhc()
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("received command: ", cmd.Stringify())
-	fmt.Fprintf(conn, cmd.Stringify()+"\n")
+	fmt.Println("received command: ", cmd)
+	fmt.Fprintf(conn, cmd+"\n")
 	return nil
 }

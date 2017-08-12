@@ -14,8 +14,8 @@ apiKey =    ""
 [nhc]
 host =          "nhc.csnet.me"
 port =          8000
-registerCmd =   "{\"cmd\":\"startevents\"}"
-getEquipCmd =   "{\"cmd\":\"listactions\"}"
-getLocCmd =     "{\"cmd\":\"listlocations\"}"
-getThermostat = "{\"cmd\":\"listthermostat\"}"
-getEnergy =     "{\"cmd\":\"listenergy\"}"
+registerCmd =   "startevents"
+getEquipCmd =   "listactions"
+getLocCmd =     "listlocations"
+getThermostat = "listthermostat"
+getEnergy =     "listenergy"
