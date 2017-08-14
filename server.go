@@ -9,25 +9,13 @@ import (
 
 func main() {
 	log.Info("Starting")
-
-	//duration := time.Duration(1) * time.Second
-	//time.Sleep(duration)
-	//var myCmd nhc.SimpleCmd
-	//myCmd.Cmd = config.Conf.NhcConfig.GetEquipCmd
-	//_ = nhc.SendCommand(nhc.RegisterCMD)
-	//fmt.Println(config.Conf.NhcConfig.GetEquipCmd)
-	//_ = nhc.SendCommand(nhc.ListActions)
-	//_ = nhc.SendCommand(myCmd.Stringify())
+	// Initialize internal "db" with NHC equipments
+	// Send list commands to NHC and store the results in memory
 	nhc.Init()
-	// Initialize internal db for storingNHC and Jeedom equipments
-	//db.NewStore()
-	//rec := map[string]string{"id": "0", "name": "terrasse"}
-	//rec["id"] = "0"
-	//rec["name"] = "terrasse"
-	//db.SaveToStore(rec)
+	// Startup the NHC listener for getting all events
 	go nhc.Listener()
-
-	duration := time.Duration(300) * time.Second
+	
+	duration := time.Duration(10) * time.Second
 	time.Sleep(duration)
 
 	// Start the webserver so server API
