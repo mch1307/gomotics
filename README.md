@@ -2,6 +2,7 @@
 
 Work In Progress
 
-Go backend server for interfacing different domotics component
+Go server for interfacing different domotics components/systems
 
-First goal: jeedom and Niko Home Control
+First goal: Niko Home Control
+Then: Jeedom?
