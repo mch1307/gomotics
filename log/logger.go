@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/mch1307/go-domo/config"
+	"github.com/mch1307/gomotics/config"
 )
 
 var (

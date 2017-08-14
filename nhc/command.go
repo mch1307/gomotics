@@ -5,17 +5,14 @@ import (
 	"net"
 	"strconv"
 
-	"github.com/mch1307/go-domo/config"
+	"github.com/mch1307/gomotics/config"
+	"github.com/mch1307/gomotics/log"
 )
 
 // ConnectNhc establish connection to nhc andreturn the tcp connection
 //func ConnectNhc(nhcConf config.NhcConf) (conn *net.TCPConn, err error) {
 func ConnectNhc() (conn *net.TCPConn, err error) {
-	cfg, err := config.GetConf()
-	if err != nil {
-		panic(err)
-	}
-	nhcConf := cfg.NhcConfig
+	nhcConf := config.Conf.NhcConfig
 
 	connectString, err := net.ResolveTCPAddr("tcp", nhcConf.Host+":"+strconv.Itoa(nhcConf.Port))
 	if err != nil {
@@ -28,6 +25,7 @@ func ConnectNhc() (conn *net.TCPConn, err error) {
 		println("error connecting to nhc: ", err)
 		panic(err)
 	}
+	//fmt.Println("Connected to nhc")
 	return conn, err
 }
 
@@ -37,7 +35,7 @@ func SendCommand(cmd string) error {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("received command: ", cmd)
+	log.Info("received command: ", cmd)
 	fmt.Fprintf(conn, cmd+"\n")
 	return nil
 }

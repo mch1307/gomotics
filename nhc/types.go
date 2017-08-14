@@ -4,10 +4,19 @@ import (
 	"encoding/json"
 )
 
+const (
+	RegisterCMD     = "{\"cmd\":\"startevents\"}"
+	ListActions     = "{\"cmd\":\"listactions\"}"
+	ListLocations   = "{\"cmd\":\"listlocations\"}"
+	ListEnergies    = "{\"cmd\":\"listenergy\"}"
+	ListThermostats = "{\"cmd\":\"listthermostat\"}"
+)
+
 // Message generic struct to hold nhc messages
 // used to identify the message type before futher parsing
 type Message struct {
-	Cmd string `json:"cmd"`
+	Cmd   string `json:"cmd"`
+	Event string `json:"event"`
 	//Data []NhcAction `json:"data"`
 	//Data []interface{} `json:"data"`
 	Data json.RawMessage
@@ -22,6 +31,12 @@ type Action struct {
 	Value1   int
 	Value2   int
 	Value3   int
+}
+
+// Event holds an individual event
+type Event struct {
+	ID    int `json:"id"`
+	Value int `json:"value1"`
 }
 
 // Location holds one nhc location

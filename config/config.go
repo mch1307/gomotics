@@ -26,7 +26,7 @@ type JeedomConf struct {
 type NhcConf struct {
 	Host         string
 	Port         int
-	RegisterCmd  string
+	RegisterCmd  string `toml:"registerCmd"`
 	GetEquipCmd  string
 	GetLocCmd    string
 	GetEnergyCmd string

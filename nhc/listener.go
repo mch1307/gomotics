@@ -4,55 +4,43 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/mch1307/go-domo/config"
-	"github.com/mch1307/go-domo/log"
+	"github.com/mch1307/gomotics/config"
+	"github.com/mch1307/gomotics/log"
 )
 
 // Listener start a connection to nhc host, register itself
 // to receive and route all messages from nhc broadcast
 func Listener() error {
-	globalConf, err := config.GetConf()
-	if err != nil {
-		panic(err)
-	}
-	nhcConf := globalConf.NhcConfig
+	/* 	globalConf, err := config.GetConf()
+	   	if err != nil {
+	   		panic(err)
+	   	}
+	   	nhcConf := globalConf.NhcConfig */
+	nhcConf := config.Conf.NhcConfig
+
 	conn, err := ConnectNhc()
 	if err != nil {
+		fmt.Println("error connecting to nhc")
 		return err
 	}
 
 	fmt.Fprintf(conn, nhcConf.RegisterCmd+"\n")
 	var nhcMessage Message
-	var nhcActions []Action
-	var nhcLocations []Location
-
-	reader := json.NewDecoder(conn)
 
 	for {
+		reader := json.NewDecoder(conn)
 		if err := reader.Decode(&nhcMessage); err != nil {
-			log.Warn(err)
+			log.Info(err)
 			panic(err)
 		}
-		switch nhcMessage.Cmd {
-		case "startevents":
+		fmt.Println("listerner event: ", &nhcMessage.Event)
+		fmt.Println("listerner cmd: ", &nhcMessage.Cmd)
+		if nhcMessage.Cmd == "startevents" {
 			log.Info("Listener registered")
-		case "listactions":
-			log.Info("listactions")
-			err := json.Unmarshal(nhcMessage.Data, &nhcActions)
-			if err != nil {
-				log.Warn(err)
-				panic(err)
-			}
-			fmt.Println("json", nhcActions)
-		case "listlocations":
-			log.Info("listlocations")
-			err := json.Unmarshal(nhcMessage.Data, &nhcLocations)
-			if err != nil {
-				log.Warn(err)
-				panic(err)
-			}
-		case "event":
-			fmt.Println("event received")
+			nhcMessage.Cmd = "dropme"
+		} else {
+			Route(nhcMessage)
+			nhcMessage.Event = "dropme"
 		}
 	}
 }
