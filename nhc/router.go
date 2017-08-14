@@ -16,6 +16,7 @@ var (
 )
 
 // Route parse and route incoming message the right handler
+// ugly, code repetition with json parsing?
 func Route(msg types.NhcMessage) {
 	if msg.Cmd == "listlocations" {
 		err := json.Unmarshal(msg.Data, &nhcLocations)

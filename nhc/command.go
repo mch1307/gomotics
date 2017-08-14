@@ -37,5 +37,5 @@ func SendCommand(cmd string) error {
 	}
 	log.Info("received command: ", cmd)
 	fmt.Fprintf(conn, cmd+"\n")
-	return nil
+	return err
 }
