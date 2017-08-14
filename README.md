@@ -1,4 +1,6 @@
-# gomotics
+# gomotics [WIP]
+
+Work In Progress
 
 Go backend server for interfacing different domotics component
 
