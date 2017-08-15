@@ -1,8 +1,7 @@
 package db
 
 import (
-	"fmt"
-
+	"github.com/mch1307/gomotics/log"
 	"github.com/mch1307/gomotics/types"
 )
 
@@ -29,8 +28,8 @@ func BuildNhcItems() {
 		nhcItem.State = rec.Value1
 		tmpLoc := getNhcLocation(rec.Location)
 		nhcItem.Location = tmpLoc.Name
-		fmt.Println("build: ", nhcItem)
 	}
+	log.Debug("NhcItemsCollection built")
 }
 
 // NewNhcItem instantiate new NhcItem
@@ -54,12 +53,14 @@ func SaveNhcAction(act types.NhcAction) {
 		for idx, item := range nhcActionsColl {
 			if item.ID == act.ID {
 				nhcActionsColl[idx] = act
+				log.Debug("Nhc ID %v found and updated", act.ID)
 				found = true
 			}
 		}
 	}
 	if !found {
 		nhcActionsColl = append(nhcActionsColl, act)
+		log.Debug("Nhc ID %v not found -> inserted", act.ID)
 	}
 }
 
@@ -68,6 +69,7 @@ func GetNhcAction(id int) types.NhcAction {
 	var ret types.NhcAction
 	for idx, val := range nhcActionsColl {
 		if nhcActionsColl[idx].ID == id {
+			log.Debug("Nhc ID %v found", id)
 			ret = val
 		}
 	}
@@ -79,16 +81,17 @@ func SaveNhcLocation(loc types.NhcLocation) {
 	// first lookup if action already exist
 	found := false
 	if len(nhcLocationsColl) > 0 {
-		fmt.Println("len loc >0")
 		for idx, item := range nhcLocationsColl {
 			if item.ID == loc.ID {
 				nhcLocationsColl[idx] = loc
+				log.Debug("Nhc location with ID %v found and updated", loc.ID)
 				found = true
 			}
 		}
 	}
 	if !found {
 		nhcLocationsColl = append(nhcLocationsColl, loc)
+		log.Debug("Nhc location with ID %v not found -> created", loc.ID)
 	}
 }
 
@@ -97,6 +100,7 @@ func getNhcLocation(id int) types.NhcLocation {
 	var ret types.NhcLocation
 	for idx, val := range nhcLocationsColl {
 		if nhcLocationsColl[idx].ID == id {
+			log.Debug("Nhc location with ID %v found", id)
 			ret = val
 		}
 	}
@@ -115,4 +119,5 @@ func ProcessNhcEvent(evt types.NhcEvent) {
 			nhcItems[idx].State = evt.Value
 		}
 	}
+	log.Debug("Nhc event processed for NHC action id:", evt.ID)
 }

@@ -8,13 +8,13 @@ import (
 )
 
 func main() {
-	log.Info("Starting")
+	log.Info("Starting gomotics")
 	// Initialize internal "db" with NHC equipments
 	// Send list commands to NHC and store the results in memory
 	nhc.Init()
 	// Startup the NHC listener for getting all events
 	go nhc.Listener()
-	
+
 	duration := time.Duration(10) * time.Second
 	time.Sleep(duration)
 

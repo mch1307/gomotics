@@ -14,7 +14,6 @@ var nhcMessage types.NhcMessage
 
 // Init sends list commands to NHC in order to get all equipments
 func Init() {
-	fmt.Println("init invoked")
 	conn, err := ConnectNhc()
 	if err != nil {
 		log.Fatal(err)
@@ -35,4 +34,5 @@ func Init() {
 
 	// Build the nhc collection
 	db.BuildNhcItems()
+	log.Info("Nhc init done")
 }
