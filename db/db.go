@@ -24,10 +24,11 @@ func BuildNhcItems() {
 	for _, rec := range nhcActionsColl {
 		nhcItem.ID = rec.ID
 		nhcItem.Name = rec.Name
-		nhcItem.Provider = "HNC"
+		nhcItem.Provider = "NHC"
 		nhcItem.State = rec.Value1
 		tmpLoc := getNhcLocation(rec.Location)
 		nhcItem.Location = tmpLoc.Name
+		nhcItems = append(nhcItems, nhcItem)
 	}
 	log.Debug("NhcItemsCollection built")
 }
@@ -74,6 +75,11 @@ func GetNhcAction(id int) types.NhcAction {
 		}
 	}
 	return ret
+}
+
+// GetNhcItems lists all NHC items from nhcItems collection
+func GetNhcItems() []types.NhcItem {
+	return nhcItems
 }
 
 // SaveNhcLocation insert/update location in collection

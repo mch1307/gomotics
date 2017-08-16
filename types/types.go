@@ -35,13 +35,13 @@ type NhcMessage struct {
 
 // NhcAction holds one individual nhc action (equipment)
 type NhcAction struct {
-	ID       int
-	Name     string
-	Type     int
-	Location int
-	Value1   int
-	Value2   int
-	Value3   int
+	ID       int    `json:"id"`
+	Name     string `json:"name"`
+	Type     int    `json:"type"`
+	Location int    `json:"location"`
+	Value1   int    `json:"value1"`
+	Value2   int    `json:"value2"`
+	Value3   int    `json:"value3"`
 }
 
 // NhcEvent holds an individual event
@@ -58,11 +58,11 @@ type NhcLocation struct {
 
 // NhcItem NHC equipment definition
 type NhcItem struct {
-	Provider string
-	ID       int
-	Name     string
-	Location string
-	State    int
+	Provider string `json:"provider"`
+	ID       int    `json:"id"`
+	Name     string `json:"name"`
+	Location string `json:"location"`
+	State    int    `json:"state"`
 }
 
 // NhcSimpleCmd type holding a nhc command
