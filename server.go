@@ -1,23 +1,32 @@
 package main
 
 import (
-	"github.com/mch1307/gomotics/log"
+	"flag"
+	"fmt"
+	"os"
+
+	"github.com/mch1307/gomotics/config"
 	"github.com/mch1307/gomotics/server"
 )
 
+var (
+	conf string
+)
+
+func init() {
+	flag.StringVar(&conf, "conf", "", "Config file name (full path to TOML file)")
+}
+
 func main() {
-	log.Info("Starting gomotics")
-	// Initialize internal "db" with NHC equipments
-	// Send list commands to NHC and store the results in memory
-	//nhc.Init()
-	// Startup the NHC listener for getting all events
-	//go nhc.Listener()
-	//go server.RestServer()
+	flag.Parse()
+	if _, err := os.Stat(conf); err != nil {
+		fmt.Println("conf: ", conf)
+		fmt.Println(err)
+		panic("Invalid config file/path: file not found ")
+	}
+	config.Initialize(conf)
+	//log.Info("Starting gomotics")
 	s := server.Server{}
 	s.Initialize()
 	s.Run()
-
-	// Start the webserver so server API
-	//domo.Start(DomoConfig.ServerConfig.ListenPort)
-
 }

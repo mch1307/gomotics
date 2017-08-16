@@ -26,15 +26,11 @@ func init() {
 	log.SetFormatter(&log.JSONFormatter{})
 
 	var err error
-	globalConf, err = config.GetConf()
-	if err != nil {
-		panic(err)
-	}
-	logLevel, _ := log.ParseLevel(globalConf.ServerConfig.LogLevel)
+	logLevel, _ := log.ParseLevel(config.Conf.ServerConfig.LogLevel)
 
 	log.SetLevel(logLevel)
 
-	file, err := os.OpenFile(globalConf.ServerConfig.LogPath+"domo.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	file, err := os.OpenFile(config.Conf.ServerConfig.LogPath+"domo.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		panic(err)
 	}

@@ -21,6 +21,7 @@ type Equipment interface {
 func BuildNhcItems() {
 	var nhcItem types.NhcItem
 	// loop through NHC raw actions collection
+	// and build nhcItems collection
 	for _, rec := range nhcActionsColl {
 		nhcItem.ID = rec.ID
 		nhcItem.Name = rec.Name

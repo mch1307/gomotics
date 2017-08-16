@@ -43,20 +43,12 @@ type GlobalConfig struct {
 
 // Conf holds the global configuration
 var Conf GlobalConfig
-var err error
 
-func init() {
-	Conf, err = GetConf()
-	if err != nil {
-		panic(err)
-	}
-}
-
-// GetConf return the global app configuration from toml file
-func GetConf() (config GlobalConfig, err error) {
-	var cfg GlobalConfig
-	if _, err := toml.DecodeFile("./config/config.toml", &cfg); err != nil {
+// Initialize populates the Conf variable
+func Initialize(cfg string) error {
+	var err error
+	if _, err := toml.DecodeFile(cfg, &Conf); err != nil {
 		fmt.Println(err)
 	}
-	return cfg, err
+	return err
 }
