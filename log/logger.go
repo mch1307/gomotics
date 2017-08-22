@@ -3,6 +3,7 @@ package log
 import (
 	"os"
 	"path"
+	"path/filepath"
 	"runtime"
 	"strings"
 
@@ -21,7 +22,9 @@ type callInfo struct {
 	line        int
 }
 
-func init() {
+// Init initialize logger
+// Don't use ini() otherwise get called before the conf file is parsed
+func Init() {
 
 	log.SetFormatter(&log.JSONFormatter{})
 
@@ -29,8 +32,9 @@ func init() {
 	logLevel, _ := log.ParseLevel(config.Conf.ServerConfig.LogLevel)
 
 	log.SetLevel(logLevel)
+	logFilePath := filepath.Join(config.Conf.ServerConfig.LogPath, "gomotics.log")
+	file, err := os.OpenFile(logFilePath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 
-	file, err := os.OpenFile(config.Conf.ServerConfig.LogPath+"domo.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		panic(err)
 	}
