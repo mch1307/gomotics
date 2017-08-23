@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/mch1307/gomotics/config"
-	"github.com/mch1307/gomotics/db"
 	"github.com/mch1307/gomotics/log"
 	"github.com/mch1307/gomotics/types"
 )
@@ -33,6 +32,6 @@ func Init() {
 	Route(nhcMessage)
 
 	// Build the nhc collection
-	db.BuildNhcItems()
+	BuildItems()
 	log.Info("Nhc init done")
 }

@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/mch1307/gomotics/config"
-	"github.com/mch1307/gomotics/db"
 	"github.com/mch1307/gomotics/log"
 	"github.com/mch1307/gomotics/nhc"
 	"github.com/mch1307/gomotics/types"
@@ -74,7 +73,7 @@ func nhcCmd(w http.ResponseWriter, r *http.Request) {
 }
 
 func getNhcItems(w http.ResponseWriter, r *http.Request) {
-	tmp := db.GetNhcItems()
+	tmp := nhc.GetItems()
 	resp, _ := json.Marshal(tmp)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(resp)

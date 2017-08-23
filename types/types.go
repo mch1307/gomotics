@@ -28,32 +28,7 @@ type GenericItem struct {
 type NhcMessage struct {
 	Cmd   string `json:"cmd"`
 	Event string `json:"event"`
-	//Data []NhcAction `json:"data"`
-	//Data []interface{} `json:"data"`
-	Data json.RawMessage
-}
-
-// NhcAction holds one individual nhc action (equipment)
-type NhcAction struct {
-	ID       int    `json:"id"`
-	Name     string `json:"name"`
-	Type     int    `json:"type"`
-	Location int    `json:"location"`
-	Value1   int    `json:"value1"`
-	Value2   int    `json:"value2"`
-	Value3   int    `json:"value3"`
-}
-
-// NhcEvent holds an individual event
-type NhcEvent struct {
-	ID    int `json:"id"`
-	Value int `json:"value1"`
-}
-
-// NhcLocation holds one nhc location
-type NhcLocation struct {
-	ID   int
-	Name string
+	Data  json.RawMessage
 }
 
 // NhcItem NHC equipment definition

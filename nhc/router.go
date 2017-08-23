@@ -2,52 +2,45 @@ package nhc
 
 import (
 	"encoding/json"
-	"fmt"
 
-	"github.com/mch1307/gomotics/db"
 	"github.com/mch1307/gomotics/log"
 	"github.com/mch1307/gomotics/types"
 )
 
 var (
-	nhcActions   []types.NhcAction
-	nhcLocations []types.NhcLocation
-	nhcEvent     []types.NhcEvent
+	nhcActions   []Action
+	nhcLocations []Location
+	nhcEvent     []Event
 )
+
+// SaveItem save/process nhc item (location, action, event) to in mem "db"
+func SaveItem(item Message) {
+	item.Save()
+}
 
 // Route parse and route incoming message the right handler
 // ugly, code repetition with json parsing?
 func Route(msg types.NhcMessage) {
 	if msg.Cmd == "listlocations" {
-		err := json.Unmarshal(msg.Data, &nhcLocations)
-		if err != nil {
-			fmt.Println("error unmarshalling listlocations")
-			log.Warn(err)
-			panic(err)
+		if err := json.Unmarshal(msg.Data, &nhcLocations); err != nil {
+			log.Fatal(err)
 		}
 		for idx := range nhcLocations {
-			db.SaveNhcLocation(nhcLocations[idx])
+			SaveItem(nhcLocations[idx])
 		}
 	} else if msg.Cmd == "listactions" {
-		err := json.Unmarshal(msg.Data, &nhcActions)
-		if err != nil {
-			fmt.Println("error unmarshalling listactions")
-			log.Warn(err)
-			panic(err)
+		if err := json.Unmarshal(msg.Data, &nhcActions); err != nil {
+			log.Fatal(err)
 		}
 		for idx := range nhcActions {
-			db.SaveNhcAction(nhcActions[idx])
+			SaveItem(nhcActions[idx])
 		}
 	} else if msg.Event == "listactions" {
-		err := json.Unmarshal(msg.Data, &nhcEvent)
-		if err != nil {
-			fmt.Println("error unmarshalling listactions event")
-			log.Warn(err)
-			panic(err)
+		if err := json.Unmarshal(msg.Data, &nhcEvent); err != nil {
+			log.Fatal(err)
 		}
 		for idx := range nhcEvent {
-			db.ProcessNhcEvent(nhcEvent[idx])
+			SaveItem(nhcEvent[idx])
 		}
-
 	}
 }
