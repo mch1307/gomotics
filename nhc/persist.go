@@ -21,14 +21,14 @@ func BuildItems() {
 		nhcItem.Name = rec.Name
 		nhcItem.Provider = "NHC"
 		nhcItem.State = rec.Value1
-		tmpLoc := getLocation(rec.Location)
+		tmpLoc := GetLocation(rec.Location)
 		nhcItem.Location = tmpLoc.Name
 		items = append(items, nhcItem)
 	}
 	log.Debug("itemsCollection built")
 }
 
-// NewItem instantiate new NhcItem
+/* // NewItem instantiate new NhcItem
 func NewItem(provider string, id, state int) Item {
 	new := Item{}
 	nhcAction := GetAction(id)
@@ -36,10 +36,10 @@ func NewItem(provider string, id, state int) Item {
 	new.ID = id
 	new.Name = nhcAction.Name
 	new.State = state
-	loc := getLocation(nhcAction.Location)
+	loc := GetLocation(nhcAction.Location)
 	new.Location = loc.Name
 	return new
-}
+} */
 
 // SaveAction insert/update action in collection
 func SaveAction(act Action) {
@@ -96,8 +96,8 @@ func SaveLocation(loc Location) {
 	}
 }
 
-// getLocation gets nhc action from collection
-func getLocation(id int) Location {
+// GetLocation gets nhc action from collection
+func GetLocation(id int) Location {
 	var ret Location
 	for idx, val := range locationsColl {
 		if locationsColl[idx].ID == id {

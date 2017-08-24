@@ -10,7 +10,6 @@ import (
 	"github.com/mch1307/gomotics/config"
 	"github.com/mch1307/gomotics/log"
 	"github.com/mch1307/gomotics/nhc"
-	"github.com/mch1307/gomotics/types"
 
 	"github.com/gorilla/mux"
 )
@@ -33,13 +32,32 @@ func (s *Server) Initialize() {
 	s.Router = mux.NewRouter().StrictSlash(true)
 	s.intializeRoutes()
 	// Initialize NHC in memory db
-	nhc.Init()
+	nhc.Init(&config.Conf.NhcConfig)
 }
 
 func (s *Server) intializeRoutes() {
-	s.Router.HandleFunc("/health", Health)
-	s.Router.HandleFunc("/api/nhc/action", nhcCmd)
-	s.Router.HandleFunc("/api/nhc/list", getNhcItems)
+	s.Router.HandleFunc("/health", Health).Methods("GET")
+	s.Router.HandleFunc("/api/v1/nhc/", getNhcItems).Methods("GET")
+	s.Router.HandleFunc("/api/v1/nhc/action", nhcCmd).Methods("PUT")
+
+	s.Router.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
+		t, err := route.GetPathTemplate()
+		if err != nil {
+			return err
+		}
+		// p will contain regular expression is compatible with regular expression in Perl, Python, and other languages.
+		// for instance the regular expression for path '/articles/{id}' will be '^/articles/(?P<v0>[^/]+)$'
+		p, err := route.GetPathRegexp()
+		if err != nil {
+			return err
+		}
+		m, err := route.GetMethods()
+		if err != nil {
+			return err
+		}
+		fmt.Println(strings.Join(m, ","), t, p)
+		return nil
+	})
 }
 
 // Run starts the server process
@@ -64,7 +82,7 @@ func nhcCmd(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println("invalid request: value should be numeric")
 	}
-	var myCmd types.NhcSimpleCmd
+	var myCmd nhc.NhcSimpleCmd
 	myCmd.Cmd = "executeactions"
 	myCmd.ID = id
 	myCmd.Value = val

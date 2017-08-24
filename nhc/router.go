@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 
 	"github.com/mch1307/gomotics/log"
-	"github.com/mch1307/gomotics/types"
 )
 
 var (
@@ -14,13 +13,13 @@ var (
 )
 
 // SaveItem save/process nhc item (location, action, event) to in mem "db"
-func SaveItem(item Message) {
+func SaveItem(item MessageIntf) {
 	item.Save()
 }
 
 // Route parse and route incoming message the right handler
 // ugly, code repetition with json parsing?
-func Route(msg types.NhcMessage) {
+func Route(msg Message) {
 	if msg.Cmd == "listlocations" {
 		if err := json.Unmarshal(msg.Data, &nhcLocations); err != nil {
 			log.Fatal(err)

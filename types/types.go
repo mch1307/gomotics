@@ -1,15 +1,7 @@
 package types
 
-import (
+/* import (
 	"encoding/json"
-)
-
-const (
-	RegisterCMD     = "{\"cmd\":\"startevents\"}"
-	ListActions     = "{\"cmd\":\"listactions\"}"
-	ListLocations   = "{\"cmd\":\"listlocations\"}"
-	ListEnergies    = "{\"cmd\":\"listenergy\"}"
-	ListThermostats = "{\"cmd\":\"listthermostat\"}"
 )
 
 // GenericItem holds definition of item equipment
@@ -51,7 +43,7 @@ type NhcSimpleCmd struct {
 func (sc NhcSimpleCmd) Stringify() string {
 	tmp, _ := json.Marshal(sc)
 	return string(tmp)
-}
+} */
 
 /* // Equipment holds the global equipment definition
 type Equipment struct {

@@ -6,22 +6,21 @@ import (
 
 	"github.com/mch1307/gomotics/config"
 	"github.com/mch1307/gomotics/log"
-	"github.com/mch1307/gomotics/types"
 )
 
 // Listener start a connection to nhc host, register itself
 // to receive and route all messages from nhc broadcast
 func Listener() error {
 
-	conn, err := ConnectNhc()
+	conn, err := ConnectNhc(&config.Conf.NhcConfig)
 	if err != nil {
 		fmt.Println("error connecting to nhc")
 		return err
 	}
 
-	fmt.Fprintf(conn, config.Conf.NhcConfig.RegisterCmd+"\n")
-	var nhcMessage types.NhcMessage
-
+	fmt.Fprintf(conn, RegisterCMD+"\n")
+	var nhcMessage Message
+	fmt.Println("Listener registered")
 	for {
 		reader := json.NewDecoder(conn)
 		if err := reader.Decode(&nhcMessage); err != nil {
@@ -33,7 +32,7 @@ func Listener() error {
 			nhcMessage.Cmd = "dropme"
 		} else {
 			Route(nhcMessage)
-			nhcMessage.Event = "dropme"
+			
 		}
 	}
 }
