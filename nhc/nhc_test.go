@@ -13,9 +13,9 @@ import (
 )
 
 const (
-	CONN_HOST = "ws2"
-	CONN_PORT = "8000"
-	CONN_TYPE = "tcp"
+	connectHost  = "localhost"
+	connectPort  = "8000"
+	connectProto = "tcp"
 )
 
 var (
@@ -29,7 +29,7 @@ var (
 	popFakeRun                       bool
 )
 
-var testConf = config.NhcConf{Host: "ws2", Port: 8000}
+var testConf = config.NhcConf{Host: "localhost", Port: 8000}
 var command = Event{ID: 1, Value: 100}
 
 /* type nhCmdMessage struct {
@@ -37,7 +37,7 @@ var command = Event{ID: 1, Value: 100}
 } */
 
 func init() {
-	config.Conf.NhcConfig.Host = "ws2"
+	config.Conf.NhcConfig.Host = "localhost"
 	config.Conf.NhcConfig.Port = 8000
 	go MockNHC()
 	time.Sleep(1 * time.Second)
@@ -69,14 +69,14 @@ func popFakeData() {
 
 // MockNHC simulates a NHC controller on localhost:8000
 func MockNHC() {
-	l, err := net.Listen(CONN_TYPE, CONN_HOST+":"+CONN_PORT)
+	l, err := net.Listen(connectProto, connectHost+":"+connectPort)
 	if err != nil {
 		fmt.Println("Error listening:", err.Error())
 		os.Exit(1)
 	}
 	// Close the listener when the application closes.
 	defer l.Close()
-	fmt.Println("Listening on " + CONN_HOST + ":" + CONN_PORT)
+	fmt.Println("Listening on " + connectHost + ":" + connectPort)
 	for {
 		// Listen for an incoming connection.
 		conn, err := l.Accept()
