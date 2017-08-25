@@ -11,6 +11,7 @@ import (
 // Listener start a connection to nhc host, register itself
 // to receive and route all messages from nhc broadcast
 func Listener() error {
+	var nhcMessage Message
 
 	conn, err := ConnectNhc(&config.Conf.NhcConfig)
 	if err != nil {
@@ -19,8 +20,7 @@ func Listener() error {
 	}
 
 	fmt.Fprintf(conn, RegisterCMD+"\n")
-	var nhcMessage Message
-	fmt.Println("Listener registered")
+
 	for {
 		reader := json.NewDecoder(conn)
 		if err := reader.Decode(&nhcMessage); err != nil {
@@ -32,7 +32,6 @@ func Listener() error {
 			nhcMessage.Cmd = "dropme"
 		} else {
 			Route(nhcMessage)
-			
 		}
 	}
 }

@@ -1,6 +1,7 @@
 package nhc
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"net"
@@ -25,46 +26,77 @@ var (
 	`
 	actionEvent = `{"event":"listactions","data":[{"id":1,"value1":100}]}
 	`
-	fakeActionsMsg, fakeLocationsMsg Message
-	popFakeRun                       bool
+	testConf = config.NhcConf{Host: "localhost", Port: 8000}
+	command  = Event{ID: 1, Value: 100}
+	myCmd    NhcSimpleCmd
 )
 
-var testConf = config.NhcConf{Host: "localhost", Port: 8000}
-var command = Event{ID: 1, Value: 100}
+type Sessions []*Session
 
-/* type nhCmdMessage struct {
-	cmd string `json:"cmd"`
-} */
+var Clients Sessions
+
+type Session struct {
+	sType      string
+	connection net.Conn
+	reader     *bufio.Reader
+	writer     *bufio.Writer
+}
+
+func NewSession(conn net.Conn) *Session {
+	reader := bufio.NewReader(conn)
+	writer := bufio.NewWriter(conn)
+	session := &Session{
+		connection: conn,
+		reader:     reader,
+		writer:     writer,
+	}
+	Clients = append(Clients, session)
+	return session
+}
+
+func (session *Session) Handle() {
+	for {
+		//fmt.Println("mock msg: ", nhcMessage.Cmd, nhcMessage.Event, nhcMessage.Data)
+		message, _ := bufio.NewReader(session.connection).ReadBytes('\n')
+		if len(message) > 0 {
+			if err := json.Unmarshal(message, &nhcMessage); err != nil {
+				fmt.Println("error reading input ", err)
+			}
+			if nhcMessage.Cmd == "startevents" {
+				fmt.Println("Listener session")
+				session.sType = "listener"
+			} else if nhcMessage.Cmd == "listactions" {
+				fmt.Println("Actions: ", nhcMessage.Cmd, nhcMessage.Event, session.sType)
+				session.connection.Write([]byte(actions))
+				nhcMessage.Cmd = "dropme"
+			} else if nhcMessage.Cmd == "listlocations" {
+				fmt.Println("Location: ", nhcMessage.Cmd, nhcMessage.Event, session.sType)
+				session.connection.Write([]byte(locations))
+				nhcMessage.Cmd = "dropme"
+			} else if nhcMessage.Cmd == "executeactions" {
+				fmt.Println("Event: ", nhcMessage.Cmd, nhcMessage.Event, session.sType)
+				for _, cli := range Clients {
+					if cli.sType == "listener" {
+						cli.connection.Write([]byte(actionEvent))
+					}
+				}
+			}
+		}
+	}
+}
 
 func init() {
 	config.Conf.NhcConfig.Host = "localhost"
 	config.Conf.NhcConfig.Port = 8000
 	go MockNHC()
-	time.Sleep(1 * time.Second)
-	//go Listener()
-	time.Sleep(1 * time.Second)
+
+	go Listener()
+	time.Sleep(500 * time.Millisecond)
 	Init(&testConf)
-
-}
-
-func popFakeData() {
-
-	if !popFakeRun {
-		fmt.Println("popFake false")
-		if err := json.Unmarshal([]byte(locations), &fakeLocationsMsg); err != nil {
-			fmt.Println("Error unmarshalling location")
-			panic(err)
-		}
-		Route(fakeLocationsMsg)
-
-		if err := json.Unmarshal([]byte(actions), &fakeActionsMsg); err != nil {
-			fmt.Println("Error unmarshalling action")
-			panic(err)
-		}
-		Route(fakeActionsMsg)
-		BuildItems()
-		popFakeRun = true
-	}
+	myCmd.Cmd = "executeactions"
+	myCmd.ID = 1
+	myCmd.Value = 100
+	//SendCommand(myCmd.Stringify())
 }
 
 // MockNHC simulates a NHC controller on localhost:8000
@@ -80,35 +112,40 @@ func MockNHC() {
 	for {
 		// Listen for an incoming connection.
 		conn, err := l.Accept()
+
 		if err != nil {
 			fmt.Println("Error accepting: ", err.Error())
 			os.Exit(1)
 		}
-		// Handle connections in a new goroutine.
-		go handleConnection(conn)
+		// populate the list of Clients
+		client := NewSession(conn)
+		// handle connection in goroutine
+		go client.Handle()
 	}
 }
 
 func handleConnection(conn net.Conn) {
 	var nhcMessage Message
 
-	reader := json.NewDecoder(conn)
 	for {
 		//fmt.Println("mock msg: ", nhcMessage.Cmd, nhcMessage.Event, nhcMessage.Data)
-		if err := reader.Decode(&nhcMessage); err != nil {
-			fmt.Println("error reading input ", err)
-		}
-		if nhcMessage.Cmd == "listactions" {
-			fmt.Println("Actions: ", nhcMessage.Cmd, nhcMessage.Event, nhcMessage.Data)
-			conn.Write([]byte(actions))
-			nhcMessage.Cmd = "dropme"
-		} else if nhcMessage.Cmd == "listlocations" {
-			fmt.Println("Location: ", nhcMessage.Cmd, nhcMessage.Event, nhcMessage.Data)
-			conn.Write([]byte(locations))
-			nhcMessage.Cmd = "dropme"
-		} else if nhcMessage.Event == "listactions" {
-			fmt.Println("Event: ", nhcMessage.Cmd, nhcMessage.Event, nhcMessage.Data)
-			conn.Write([]byte(actionEvent))
+		message, _ := bufio.NewReader(conn).ReadBytes('\n')
+		if len(message) > 0 {
+			if err := json.Unmarshal(message, &nhcMessage); err != nil {
+				fmt.Println("error reading input ", err)
+			}
+			if nhcMessage.Cmd == "listactions" {
+				//fmt.Println("Actions: ", nhcMessage.Cmd, nhcMessage.Event, nhcMessage.Data)
+				conn.Write([]byte(actions))
+				nhcMessage.Cmd = "dropme"
+			} else if nhcMessage.Cmd == "listlocations" {
+				//fmt.Println("Location: ", nhcMessage.Cmd, nhcMessage.Event, nhcMessage.Data)
+				conn.Write([]byte(locations))
+				nhcMessage.Cmd = "dropme"
+			} else if nhcMessage.Cmd == "executeactions" {
+				//fmt.Println("Event: ", nhcMessage.Cmd, nhcMessage.Event, nhcMessage.Data)
+				conn.Write([]byte(actionEvent))
+			}
 		}
 	}
 }
@@ -126,7 +163,7 @@ func Test_getLocation(t *testing.T) {
 }
 
 func TestGetAction(t *testing.T) {
-	//popFakeData()
+
 	type args struct {
 		id int
 	}
@@ -159,8 +196,8 @@ func TestGetItems(t *testing.T) {
 	}{
 		{"fakeSwitch", 1, 100},
 	}
-
-	ProcessEvent(command)
+	SendCommand(myCmd.Stringify())
+	time.Sleep(100 * time.Millisecond)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := GetItems()
