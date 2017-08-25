@@ -28,13 +28,6 @@ type NhcConf struct {
 	Port int
 }
 
-/* 	RegisterCmd  string `toml:"registerCmd"`
-	GetEquipCmd  string
-	GetLocCmd    string
-	GetEnergyCmd string
-	GetThermoCmd string
-}
-*/
 // GlobalConfig holds the structure of the yml configuration file
 // It has 3 sections: server, jeedom and nhc
 type GlobalConfig struct {
