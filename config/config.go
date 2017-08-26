@@ -44,6 +44,7 @@ func Initialize(cfg string) error {
 	var err error
 	if _, err := toml.DecodeFile(cfg, &Conf); err != nil {
 		fmt.Println(err)
+		return err
 	}
 	return err
 }

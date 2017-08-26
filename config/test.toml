@@ -1,0 +1,8 @@
+[server]
+ListenPort = 8081
+LogLevel = "DEBUG"
+LogPath = "/tmp"
+
+[nhc]
+host =          "localhost"
+port =          8000
