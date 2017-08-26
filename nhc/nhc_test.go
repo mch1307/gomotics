@@ -93,6 +93,8 @@ func init() {
 	go Listener()
 	time.Sleep(500 * time.Millisecond)
 	Init(&testConf)
+	// call twice to test update items in persit.go
+	Init(&testConf)
 	myCmd.Cmd = "executeactions"
 	myCmd.ID = 1
 	myCmd.Value = 100
