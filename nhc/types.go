@@ -3,10 +3,15 @@ package nhc
 import "encoding/json"
 
 const (
-	RegisterCMD     = "{\"cmd\":\"startevents\"}"
-	ListActions     = "{\"cmd\":\"listactions\"}"
-	ListLocations   = "{\"cmd\":\"listlocations\"}"
-	ListEnergies    = "{\"cmd\":\"listenergy\"}"
+	// RegisterCMD holds NHC startevents
+	RegisterCMD = "{\"cmd\":\"startevents\"}"
+	// ListActions holds NHC listactions
+	ListActions = "{\"cmd\":\"listactions\"}"
+	// ListLocations holds NHC listlocations
+	ListLocations = "{\"cmd\":\"listlocations\"}"
+	// ListEnergies holds NHC listenergy
+	ListEnergies = "{\"cmd\":\"listenergy\"}"
+	// ListThermostats holds NHC listthermostat
 	ListThermostats = "{\"cmd\":\"listthermostat\"}"
 )
 
@@ -22,22 +27,22 @@ type GenericItem struct {
 }
 
 // Message generic struct to hold nhc messages
-// used to identify the message type before futher parsing
+// used to identify the message type before further parsing
 type Message struct {
 	Cmd   string `json:"cmd"`
 	Event string `json:"event"`
 	Data  json.RawMessage
 }
 
-// NhcSimpleCmd type holding a nhc command
-type NhcSimpleCmd struct {
+// SimpleCmd type holding a nhc command
+type SimpleCmd struct {
 	Cmd   string `json:"cmd"`
 	ID    int    `json:"id"`
 	Value int    `json:"value1"`
 }
 
 // Stringify return the string version of SimpleCmd
-func (sc NhcSimpleCmd) Stringify() string {
+func (sc SimpleCmd) Stringify() string {
 	tmp, _ := json.Marshal(sc)
 	return string(tmp)
 }

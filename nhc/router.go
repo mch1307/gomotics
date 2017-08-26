@@ -18,7 +18,6 @@ func SaveItem(item MessageIntf) {
 }
 
 // Route parse and route incoming message the right handler
-// ugly, code repetition with json parsing?
 func Route(msg Message) {
 	if msg.Cmd == "listlocations" {
 		if err := json.Unmarshal(msg.Data, &nhcLocations); err != nil {

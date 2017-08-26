@@ -28,7 +28,7 @@ var (
 	`
 	testConf = config.NhcConf{Host: "localhost", Port: 8000}
 	command  = Event{ID: 1, Value: 100}
-	myCmd    NhcSimpleCmd
+	myCmd    SimpleCmd
 )
 
 type Sessions []*Session

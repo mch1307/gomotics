@@ -82,7 +82,7 @@ func nhcCmd(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println("invalid request: value should be numeric")
 	}
-	var myCmd nhc.NhcSimpleCmd
+	var myCmd nhc.SimpleCmd
 	myCmd.Cmd = "executeactions"
 	myCmd.ID = id
 	myCmd.Value = val
