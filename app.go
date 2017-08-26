@@ -27,7 +27,7 @@ func main() {
 	}
 	config.Initialize(conf)
 	log.Init()
-	//log.Info("Starting gomotics")
+	log.Info("Starting gomotics")
 	s := server.Server{}
 	s.Initialize()
 	s.Run()
