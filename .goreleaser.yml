@@ -15,3 +15,7 @@ archive:
   format: tar.gz
   files:
     - gomotics.licence.txt
+release:
+  github:
+    owner: mch1307
+    name: gomotics    
