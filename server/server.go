@@ -22,6 +22,11 @@ type Server struct {
 	LogFile    string
 }
 
+func init() {
+	log.Init()
+	log.Info("Starting gomotics")
+}
+
 // Initialize initialize the server
 // also calls the internal in mem db
 func (s *Server) Initialize() {

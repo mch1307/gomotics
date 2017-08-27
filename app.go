@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/mch1307/gomotics/config"
-	"github.com/mch1307/gomotics/log"
 	"github.com/mch1307/gomotics/server"
 )
 
@@ -21,13 +20,10 @@ func init() {
 func main() {
 	flag.Parse()
 	if _, err := os.Stat(conf); err != nil {
-		fmt.Println("conf: ", conf)
-		fmt.Println(err)
-		panic("Invalid config file/path: file not found ")
+		fmt.Println("Invalid config file/path, file not found: ", err)
+		panic(err)
 	}
 	config.Initialize(conf)
-	log.Init()
-	log.Info("Starting gomotics")
 	s := server.Server{}
 	s.Initialize()
 	s.Run()
