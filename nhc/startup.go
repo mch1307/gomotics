@@ -14,6 +14,7 @@ var nhcMessage Message
 func Init(cfg *config.NhcConf) {
 	conn, err := ConnectNhc(cfg)
 	if err != nil {
+		fmt.Println(err)
 		log.Fatalf("Unable to connect to NHC host: %v. Error: %v", cfg.Host, err)
 	}
 	reader := json.NewDecoder(conn)
@@ -21,14 +22,14 @@ func Init(cfg *config.NhcConf) {
 	// sends listlocations command to NHC
 	fmt.Fprintf(conn, ListLocations+"\n")
 	if err := reader.Decode(&nhcMessage); err != nil {
-		log.Errorf("Unable to parse NHC ListLocations message: %v", err)
+		log.Fatalf("Unable to parse NHC ListLocations message: %v", err)
 	}
 	Route(nhcMessage)
 
 	// sends listActions command to NHC
 	fmt.Fprintf(conn, ListActions+"\n")
 	if err := reader.Decode(&nhcMessage); err != nil {
-		log.Errorf("Unable to parse NHC ListActions message: %v", err)
+		log.Fatalf("Unable to parse NHC ListActions message: %v", err)
 	}
 	Route(nhcMessage)
 

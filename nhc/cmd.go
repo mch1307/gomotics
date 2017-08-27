@@ -9,21 +9,20 @@ import (
 	"github.com/mch1307/gomotics/log"
 )
 
-// ConnectNhc establish connection to nhc andreturn the tcp connection
+// ConnectNhc establish connection to nhc and return the tcp connection
 //func ConnectNhc(nhcConf config.NhcConf) (conn *net.TCPConn, err error) {
 func ConnectNhc(cfg *config.NhcConf) (conn *net.TCPConn, err error) {
 	//nhcConf := config.Conf.NhcConfig
 
 	connectString, err := net.ResolveTCPAddr("tcp", cfg.Host+":"+strconv.Itoa(cfg.Port))
 	if err != nil {
-		println("Issue converting host + port: ", err)
+		fmt.Println("connNhc ", err)
 		return nil, err
 	}
 
 	conn, err = net.DialTCP("tcp", nil, connectString)
 	if err != nil {
-		println("error connecting to nhc: ", err)
-		panic(err)
+		log.Fatal("error connecting to nhc: ", err)
 	}
 	//log.Info("Connected to nhc")
 	return conn, err
@@ -33,7 +32,7 @@ func ConnectNhc(cfg *config.NhcConf) (conn *net.TCPConn, err error) {
 func SendCommand(cmd string) error {
 	conn, err := ConnectNhc(&config.Conf.NhcConfig)
 	if err != nil {
-		panic(err)
+		log.Errorf("error sending command: %v. Err Msg: %v", cmd, err)
 	}
 	log.Debug("received command: ", cmd)
 	fmt.Fprintf(conn, cmd+"\n")

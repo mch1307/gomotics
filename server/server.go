@@ -38,6 +38,7 @@ func (s *Server) Initialize() {
 func (s *Server) intializeRoutes() {
 	s.Router.HandleFunc("/health", Health).Methods("GET")
 	s.Router.HandleFunc("/api/v1/nhc/", getNhcItems).Methods("GET")
+	s.Router.HandleFunc("/api/v1/nhc/{id}", getNhcItem).Methods("GET")
 	s.Router.HandleFunc("/api/v1/nhc/action", nhcCmd).Methods("PUT")
 
 	s.Router.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
@@ -95,4 +96,18 @@ func getNhcItems(w http.ResponseWriter, r *http.Request) {
 	resp, _ := json.Marshal(tmp)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(resp)
+}
+
+func getNhcItem(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	tmp := nhc.GetItems()
+	var resp nhc.Item
+	for _, val := range tmp {
+		if i, _ := strconv.Atoi(params["id"]); val.ID == i {
+			resp = val
+		}
+	}
+	rsp, _ := json.Marshal(resp)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(rsp)
 }

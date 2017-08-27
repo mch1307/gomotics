@@ -1,10 +1,6 @@
 package nhc
 
-import (
-	"encoding/json"
-
-	"github.com/mch1307/gomotics/log"
-)
+import "encoding/json"
 
 var (
 	nhcActions   []Action
@@ -20,23 +16,27 @@ func SaveItem(item MessageIntf) {
 // Route parse and route incoming message the right handler
 func Route(msg Message) {
 	if msg.Cmd == "listlocations" {
-		if err := json.Unmarshal(msg.Data, &nhcLocations); err != nil {
+		/* Commented err handling as all incoming msg have already been json parsed once */
+		/* 		if err := json.Unmarshal(msg.Data, &nhcLocations); err != nil {
 			log.Fatal(err)
-		}
+		} */
+		_ = json.Unmarshal(msg.Data, &nhcLocations)
 		for idx := range nhcLocations {
 			SaveItem(nhcLocations[idx])
 		}
 	} else if msg.Cmd == "listactions" {
-		if err := json.Unmarshal(msg.Data, &nhcActions); err != nil {
+		/* 		if err := json.Unmarshal(msg.Data, &nhcActions); err != nil {
 			log.Fatal(err)
-		}
+		} */
+		_ = json.Unmarshal(msg.Data, &nhcActions)
 		for idx := range nhcActions {
 			SaveItem(nhcActions[idx])
 		}
 	} else if msg.Event == "listactions" {
-		if err := json.Unmarshal(msg.Data, &nhcEvent); err != nil {
-			log.Fatal(err)
-		}
+		/* 		if err := json.Unmarshal(msg.Data, &nhcEvent); err != nil {
+			log.Errorf("unable to parse message %v, err: %v", msg.Data, err)
+		} */
+		_ = json.Unmarshal(msg.Data, &nhcEvent)
 		for idx := range nhcEvent {
 			SaveItem(nhcEvent[idx])
 		}
