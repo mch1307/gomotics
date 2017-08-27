@@ -73,7 +73,7 @@ func (session *Session) Handle() {
 				fmt.Println("Listener session")
 				session.sType = "listener"
 				session.connection.Write([]byte(startEvents))
-				session.connection.Write([]byte(invalidNHCMsg))
+				//session.connection.Write([]byte(invalidMsg))
 			} else if nhcMessage.Cmd == "listactions" {
 				fmt.Println("Actions: ", nhcMessage.Cmd, nhcMessage.Event, session.sType)
 				session.connection.Write([]byte(actions))
@@ -86,7 +86,10 @@ func (session *Session) Handle() {
 				fmt.Println("Event: ", nhcMessage.Cmd, nhcMessage.Event, session.sType)
 				for _, cli := range Clients {
 					if cli.sType == "listener" {
-						cli.connection.Write([]byte(actionEvent))
+						cli.connection.Write([]byte(actionEvent + invalidMsg))
+						time.Sleep(200 * time.Millisecond)
+						fmt.Println("debug test")
+						cli.connection.Write([]byte(invalidMsg))
 					}
 				}
 			}
@@ -186,7 +189,7 @@ func TestGetItems(t *testing.T) {
 		{"fakeSwitch", 1, 100},
 	}
 	SendCommand(myCmd.Stringify())
-	time.Sleep(100 * time.Millisecond)
+	time.Sleep(1000 * time.Millisecond)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := GetItems()
