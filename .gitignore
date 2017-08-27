@@ -1,2 +1,3 @@
 Godeps/
 dist/
+*.log
