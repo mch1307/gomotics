@@ -26,6 +26,8 @@ var (
 	`
 	actionEvent = `{"event":"listactions","data":[{"id":1,"value1":100}]}
 	`
+	invalidMsg = `{"event":"listactions","data":[{"id":1,"value1":100}]
+	`
 	testConf = config.NhcConf{Host: "localhost", Port: 8000}
 	command  = Event{ID: 1, Value: 100}
 	myCmd    SimpleCmd
