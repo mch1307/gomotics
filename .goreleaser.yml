@@ -13,6 +13,4 @@ builds:
 # Archive customization
 archive:
   format: tar.gz
-  files:
-    - gomotics.licence.txt
   
