@@ -14,7 +14,6 @@ var nhcMessage Message
 func Init(cfg *config.NhcConf) {
 	conn, err := ConnectNhc(cfg)
 	if err != nil {
-		fmt.Println(err)
 		log.Fatalf("Unable to connect to NHC host: %v. Error: %v", cfg.Host, err)
 	}
 	reader := json.NewDecoder(conn)
