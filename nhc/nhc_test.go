@@ -28,6 +28,8 @@ var (
 	`
 	invalidMsg = `{"event":"listactions","data":[{"id":1,"value1":100}]
 	`
+	startEvents = `{"cmd":"startevents","data":[{"id":1,"value1":100}]}
+	`
 	testConf = config.NhcConf{Host: "localhost", Port: 8000}
 	command  = Event{ID: 1, Value: 100}
 	myCmd    SimpleCmd
@@ -67,6 +69,7 @@ func (session *Session) Handle() {
 			if nhcMessage.Cmd == "startevents" {
 				fmt.Println("Listener session")
 				session.sType = "listener"
+				session.connection.Write([]byte(startEvents))
 			} else if nhcMessage.Cmd == "listactions" {
 				fmt.Println("Actions: ", nhcMessage.Cmd, nhcMessage.Event, session.sType)
 				session.connection.Write([]byte(actions))
