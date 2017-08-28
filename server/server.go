@@ -14,6 +14,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
+const healthMsg = `{"alive":true}`
+
 // Server holds the gomotics app definition
 type Server struct {
 	Router     *mux.Router
@@ -74,7 +76,9 @@ func (s *Server) Run() {
 
 // Health endpoint for health monitoring
 func Health(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Healthly!")
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte(healthMsg))
+	//fmt.Fprintln(w, "Healthly!")
 }
 
 // nhcCmd endpoints for sending NHC commands
@@ -106,6 +110,7 @@ func getNhcItems(w http.ResponseWriter, r *http.Request) {
 func getNhcItem(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	tmp := nhc.GetItems()
+	fmt.Println("getnhcItem arg: ", params["idx"])
 	var resp nhc.Item
 	for _, val := range tmp {
 		if i, _ := strconv.Atoi(params["id"]); val.ID == i {
