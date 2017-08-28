@@ -3,6 +3,7 @@ package config
 import (
 	"reflect"
 	"testing"
+	//. "github.com/mch1307/gomotics/config"
 )
 
 func TestInitialize(t *testing.T) {
@@ -11,7 +12,7 @@ func TestInitialize(t *testing.T) {
 	cfg.NhcConfig.Port = 8000
 	cfg.ServerConfig.ListenPort = 8081
 	cfg.ServerConfig.LogLevel = "DEBUG"
-	cfg.ServerConfig.LogPath = "/tmp"
+	cfg.ServerConfig.LogPath = "."
 
 	tests := []struct {
 		name     string

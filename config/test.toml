@@ -1,7 +1,7 @@
 [server]
 ListenPort = 8081
 LogLevel = "DEBUG"
-LogPath = "/tmp"
+LogPath = "."
 
 [nhc]
 host =          "localhost"
