@@ -31,8 +31,8 @@ func init() {
 
 // Initialize initialize the server
 // also calls the internal in mem db
-func (s *Server) Initialize() {
-
+func (s *Server) Initialize(conf string) {
+	config.Initialize(conf)
 	s.ListenPort = ":" + strconv.Itoa(config.Conf.ServerConfig.ListenPort)
 	s.LogLevel = config.Conf.ServerConfig.LogLevel
 	s.LogFile = config.Conf.ServerConfig.LogPath

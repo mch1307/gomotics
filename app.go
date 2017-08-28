@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/mch1307/gomotics/config"
 	"github.com/mch1307/gomotics/server"
 )
 
@@ -23,8 +22,7 @@ func main() {
 		fmt.Println("Invalid config file/path, file not found: ", err)
 		panic(err)
 	}
-	config.Initialize(conf)
 	s := server.Server{}
-	s.Initialize()
+	s.Initialize(conf)
 	s.Run()
 }
