@@ -2,7 +2,6 @@ package testutil
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/mch1307/gomotics/nhc"
 )
@@ -22,17 +21,9 @@ var (
 func PopFakeNhc() {
 
 	if !popFakeRun {
-		//fmt.Println("popFake false")
-		if err := json.Unmarshal([]byte(locations), &fakeLocationsMsg); err != nil {
-			fmt.Println("Error unmarshalling location")
-			panic(err)
-		}
+		json.Unmarshal([]byte(locations), &fakeLocationsMsg)
 		nhc.Route(fakeLocationsMsg)
-
-		if err := json.Unmarshal([]byte(actions), &fakeActionsMsg); err != nil {
-			fmt.Println("Error unmarshalling action")
-			panic(err)
-		}
+		json.Unmarshal([]byte(actions), &fakeActionsMsg)
 		nhc.Route(fakeActionsMsg)
 		nhc.BuildItems()
 		popFakeRun = true
