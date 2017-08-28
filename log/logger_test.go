@@ -150,28 +150,3 @@ func TestErrorf(t *testing.T) {
 		t.Errorf("test %v: logged msg not found", level)
 	}
 }
-
-/* func TestFatal(t *testing.T) {
-	moreInfo := retrieveCallInfo()
-	level := "fatal"
-	str := "test " + level
-	go Fatal(str)
-	time.Sleep(300 * time.Millisecond)
-	res := searchLogMsg(str, moreInfo.funcName)
-	if res.Msg != str {
-		t.Errorf("test %v: logged msg not found", level)
-	}
-}
-
-func TestFatalf(t *testing.T) {
-	moreInfo := retrieveCallInfo()
-	level := "fatal"
-	str := "test %v"
-	go Fatalf(str, level)
-	time.Sleep(300 * time.Millisecond)
-	res := searchLogMsg(str, moreInfo.funcName)
-	if res.Msg != "test fatal" {
-		t.Errorf("test %v: logged msg not found", level)
-	}
-}
-*/
