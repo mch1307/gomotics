@@ -14,7 +14,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-const healthMsg = `{"alive":true}`
+const HealthMsg = `{"alive":true}`
 
 // Server holds the gomotics app definition
 type Server struct {
@@ -31,8 +31,7 @@ func init() {
 
 // Initialize initialize the server
 // also calls the internal in mem db
-func (s *Server) Initialize(conf string) {
-	config.Initialize(conf)
+func (s *Server) Initialize() {
 	s.ListenPort = ":" + strconv.Itoa(config.Conf.ServerConfig.ListenPort)
 	s.LogLevel = config.Conf.ServerConfig.LogLevel
 	s.LogFile = config.Conf.ServerConfig.LogPath
@@ -44,9 +43,9 @@ func (s *Server) Initialize(conf string) {
 
 func (s *Server) intializeRoutes() {
 	s.Router.HandleFunc("/health", Health).Methods("GET")
-	s.Router.HandleFunc("/api/v1/nhc/", getNhcItems).Methods("GET")
-	s.Router.HandleFunc("/api/v1/nhc/{id}", getNhcItem).Methods("GET")
-	s.Router.HandleFunc("/api/v1/nhc/action", nhcCmd).Methods("PUT")
+	s.Router.HandleFunc("/api/v1/nhc/", GetNhcItems).Methods("GET")
+	s.Router.HandleFunc("/api/v1/nhc/{id}", GetNhcItem).Methods("GET")
+	s.Router.HandleFunc("/api/v1/nhc/action", NhcCmd).Methods("PUT")
 
 	s.Router.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
 		t, err := route.GetPathTemplate()
@@ -77,12 +76,12 @@ func (s *Server) Run() {
 // Health endpoint for health monitoring
 func Health(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte(healthMsg))
+	w.Write([]byte(HealthMsg))
 	//fmt.Fprintln(w, "Healthly!")
 }
 
-// nhcCmd endpoints for sending NHC commands
-func nhcCmd(w http.ResponseWriter, r *http.Request) {
+// NhcCmd endpoints for sending NHC commands
+func NhcCmd(w http.ResponseWriter, r *http.Request) {
 	vars := r.URL.Query()
 	id, err := strconv.Atoi(strings.Join(vars["id"], ""))
 	if err != nil {
@@ -97,17 +96,19 @@ func nhcCmd(w http.ResponseWriter, r *http.Request) {
 	myCmd.ID = id
 	myCmd.Value = val
 	nhc.SendCommand(myCmd.Stringify())
-	fmt.Fprintln(w, "Success")
+	w.Write([]byte("Success"))
 }
 
-func getNhcItems(w http.ResponseWriter, r *http.Request) {
+// GetNhcItems handler for /api/v1/nhc/
+func GetNhcItems(w http.ResponseWriter, r *http.Request) {
 	tmp := nhc.GetItems()
 	resp, _ := json.Marshal(tmp)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(resp)
 }
 
-func getNhcItem(w http.ResponseWriter, r *http.Request) {
+// GetNhcItems handler for /api/v1/nhc/{id]}
+func GetNhcItem(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	tmp := nhc.GetItems()
 	fmt.Println("getnhcItem arg: ", params["idx"])
