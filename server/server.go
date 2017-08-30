@@ -1,5 +1,6 @@
 package server
 
+//TODO: review the http handling (return code, ...)
 import (
 	"encoding/json"
 	"fmt"
@@ -107,18 +108,28 @@ func GetNhcItems(w http.ResponseWriter, r *http.Request) {
 	w.Write(resp)
 }
 
-// GetNhcItems handler for /api/v1/nhc/{id]}
+// GetNhcItems handler for /api/v1/nhc/{id}
 func GetNhcItem(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	found := false
 	params := mux.Vars(r)
 	tmp := nhc.GetItems()
-	fmt.Println("getnhcItem arg: ", params["idx"])
+	//fmt.Println("getnhcItem arg: ", params["id"])
 	var resp nhc.Item
 	for _, val := range tmp {
 		if i, _ := strconv.Atoi(params["id"]); val.ID == i {
+			fmt.Println("in if", params["id"], i)
 			resp = val
+			found = true
 		}
 	}
-	rsp, _ := json.Marshal(resp)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(rsp)
+	if !found {
+		fmt.Println("not found")
+		//http.Error(w, http.StatusNoContent, "no item matching given id found")
+		w.WriteHeader(http.StatusNoContent)
+		fmt.Fprint(w, string("no item matching given id found"))
+	} else {
+		rsp, _ := json.Marshal(resp)
+		w.Write(rsp)
+	}
 }

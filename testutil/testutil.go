@@ -1,3 +1,5 @@
+// testutil pkg: set of utilities for facilitating tests
+// Only used for unit/integration tests
 package testutil
 
 import (
@@ -15,8 +17,8 @@ import (
 )
 
 const (
-	connectHost  = "localhost"
-	connectPort  = "8000"
+	ConnectHost  = "localhost"
+	ConnectPort  = "8000"
 	connectProto = "tcp"
 )
 
@@ -38,7 +40,7 @@ var (
 	command                                      = nhc.Event{ID: 1, Value: 100}
 	myCmd                                        nhc.SimpleCmd
 	fakeActionsMsg, fakeLocationsMsg, nhcMessage nhc.Message
-	popFakeRun                                   bool
+	popFakeRun, initRun                          bool
 )
 
 // PopFakeNhc populates in mem db with fake data for UT
@@ -54,33 +56,37 @@ func PopFakeNhc() {
 	}
 }
 
+// InitStubNHC initialize the NHC Stub and populates dummy data in mem 4 tests
 func InitStubNHC() {
-	config.Conf.NhcConfig.Host = connectHost
-	config.Conf.NhcConfig.Port, _ = strconv.Atoi(connectPort)
-	config.Conf.ServerConfig.ListenPort = 8081
-	go MockNHC()
-	go nhc.Listener()
-	time.Sleep(500 * time.Millisecond)
-	nhc.Init(&testConf)
-	// call twice to test update items in persit.go
-	nhc.Init(&testConf)
-	/* 	myCmd.Cmd = "executeactions"
-	   	myCmd.ID = 1
-		   myCmd.Value = 100 */
-	s := server.Server{}
-	s.Initialize()
-	go s.Run()
+	if !initRun {
+		config.Conf.NhcConfig.Host = ConnectHost
+		config.Conf.NhcConfig.Port, _ = strconv.Atoi(ConnectPort)
+		config.Conf.ServerConfig.ListenPort = 8081
+		go MockNHC()
+		go nhc.Listener()
+		time.Sleep(500 * time.Millisecond)
+		nhc.Init(&testConf)
+		// call twice to test update items in persit.go
+		nhc.Init(&testConf)
+		/* 	myCmd.Cmd = "executeactions"
+		   	myCmd.ID = 1
+			   myCmd.Value = 100 */
+		s := server.Server{}
+		s.Initialize()
+		go s.Run()
+		initRun = true
+	}
 }
 
 // MockNHC simulates a NHC controller on localhost:8000
 func MockNHC() {
-	l, err := net.Listen(connectProto, connectHost+":"+connectPort)
+	l, err := net.Listen(connectProto, ConnectHost+":"+ConnectPort)
 	if err != nil {
 		os.Exit(1)
 	}
 	// Close the listener when the application closes.
 	defer l.Close()
-	fmt.Println("Listening on " + connectHost + ":" + connectPort)
+	fmt.Println("Listening on " + ConnectHost + ":" + ConnectPort)
 	for {
 		// Listen for an incoming connection.
 		conn, err := l.Accept()
@@ -94,10 +100,13 @@ func MockNHC() {
 	}
 }
 
+// Sessions type used for managin session in NHC Stub (listener vs commands)
 type Sessions []*Session
 
+// Clients holds client session list
 var Clients Sessions
 
+// Session type holds the NHC stub client connection
 type Session struct {
 	sType      string
 	connection net.Conn
@@ -105,6 +114,7 @@ type Session struct {
 	writer     *bufio.Writer
 }
 
+// NewSession populates the Sessions (list of client connections) on client connect
 func NewSession(conn net.Conn) *Session {
 	reader := bufio.NewReader(conn)
 	writer := bufio.NewWriter(conn)
@@ -117,6 +127,7 @@ func NewSession(conn net.Conn) *Session {
 	return session
 }
 
+// Handle handles the client connection
 func (session *Session) Handle() {
 	for {
 		//fmt.Println("mock msg: ", nhcMessage.Cmd, nhcMessage.Event, nhcMessage.Data)

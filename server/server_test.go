@@ -1,5 +1,6 @@
 package server_test
 
+// TODO: review the http testing
 import (
 	"encoding/json"
 	"fmt"
@@ -14,14 +15,17 @@ import (
 	"github.com/mch1307/gomotics/testutil"
 )
 
+var baseUrl string
+
 //const healthMsg = `{"alive":true}`
 
 func init() {
+	baseUrl = "http://" + testutil.ConnectHost + ":8081"
 	testutil.InitStubNHC()
 }
 
 func TestHealth(t *testing.T) {
-	req, err := http.NewRequest("GET", "/health", nil)
+	req, err := http.NewRequest("GET", baseUrl+"/health", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -35,7 +39,7 @@ func TestHealth(t *testing.T) {
 }
 
 func Test_getNhcItem(t *testing.T) {
-	req, err := http.NewRequest("GET", "/api/v1/nhc/0", nil)
+	req, err := http.NewRequest("GET", baseUrl+"/api/v1/nhc/99", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -51,7 +55,7 @@ func Test_getNhcItem(t *testing.T) {
 }
 
 func Test_getNhcItems(t *testing.T) {
-	req, err := http.NewRequest("GET", "/api/v1/nhc", nil)
+	req, err := http.NewRequest("GET", baseUrl+"/api/v1/nhc", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -76,7 +80,7 @@ func Test_getNhcItems(t *testing.T) {
 
 func Test_nhcCmd(t *testing.T) {
 	expected := "Success"
-	url := "http://localhost:8081/api/v1/nhc/action?id=0&value=100"
+	url := baseUrl + "/api/v1/nhc/action?id=1&value=100"
 	hCli := http.Client{
 		Timeout: time.Second * 2,
 	}
