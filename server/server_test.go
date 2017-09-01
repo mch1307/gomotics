@@ -83,7 +83,7 @@ func Test_nhcCmd(t *testing.T) {
 	expected := "Success"
 	url := baseUrl + "/api/v1/nhc/action?id=1&value=100"
 	hCli := http.Client{
-		Timeout: time.Second * 2,
+		Timeout: time.Second * 5,
 	}
 	req, err := http.NewRequest(http.MethodPut, url, nil)
 	if err != nil {
@@ -98,7 +98,7 @@ func Test_nhcCmd(t *testing.T) {
 	if readErr != nil {
 		fmt.Println("Read err: ", readErr)
 	}
-	defer rsp.Body.Close()
+	//defer rsp.Body.Close()
 	if string(got) != expected {
 		t.Errorf("Test_nhcCmd failed, expecting %v, got %v", expected, string(got))
 	}
