@@ -32,13 +32,14 @@ type LogEntry struct {
 }
 
 func init() {
-	logFile = filepath.Join(config.Conf.ServerConfig.LogPath, "gomotics.log")
-	if err := os.Remove(logFile); err != nil {
-		fmt.Println("could not delete log file")
-	}
 	config.Conf.ServerConfig.LogLevel = "DEBUG"
-	config.Conf.ServerConfig.LogPath = "."
-	//Init()
+	config.Conf.ServerConfig.LogPath = "c:\\temp"
+	logFile = filepath.Join(config.Conf.ServerConfig.LogPath, "gomotics.log")
+	/* 	if err := os.Remove(logFile); err != nil {
+		fmt.Println("could not delete log file")
+	} */
+
+	Init()
 	Debug("Init log testing")
 	//readLogs()
 }
@@ -55,7 +56,7 @@ func readLogs() (list LogEntries) {
 		if err := json.Unmarshal(reader.Bytes(), &LogLine); err != nil {
 			fmt.Println(err)
 		}
-		fmt.Println("log reader: ", &LogLine.Msg)
+		//fmt.Println("log reader: ", &LogLine.Msg)
 		res = append(res, LogLine)
 	}
 	return res

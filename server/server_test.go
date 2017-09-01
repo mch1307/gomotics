@@ -13,6 +13,7 @@ import (
 	"github.com/mch1307/gomotics/nhc"
 	. "github.com/mch1307/gomotics/server"
 	"github.com/mch1307/gomotics/testutil"
+	"github.com/mch1307/gomotics/types"
 )
 
 var baseUrl string
@@ -44,10 +45,10 @@ func Test_getNhcItem(t *testing.T) {
 		t.Fatal(err)
 	}
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(GetNhcItem)
+	handler := http.HandlerFunc(nhc.GetNhcItem)
 	handler.ServeHTTP(rr, req)
 	expected := "light"
-	var res nhc.Item
+	var res types.Item
 	json.Unmarshal(rr.Body.Bytes(), &res)
 	if res.Name != expected {
 		t.Errorf("getNhcItem failed: got %v, expect: %v", res, expected)
@@ -60,11 +61,11 @@ func Test_getNhcItems(t *testing.T) {
 		t.Fatal(err)
 	}
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(GetNhcItems)
+	handler := http.HandlerFunc(nhc.GetNhcItems)
 	handler.ServeHTTP(rr, req)
 	var found bool
 	expected := "light"
-	var res []nhc.Item
+	var res []types.Item
 	json.Unmarshal(rr.Body.Bytes(), &res)
 	for _, val := range res {
 		if val.ID == 0 {

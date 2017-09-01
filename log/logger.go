@@ -23,7 +23,7 @@ type callInfo struct {
 }
 
 // Init initialize logger
-// Don't use ini() otherwise get called before the conf file is parsed
+// Don't use init() otherwise get called before the conf file is parsed
 func Init() {
 
 	log.SetFormatter(&log.JSONFormatter{})
