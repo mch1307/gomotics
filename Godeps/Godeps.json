@@ -19,6 +19,11 @@
 			"Rev": "ac112f7d75a0714af1bd86ab17749b31f7809640"
 		},
 		{
+			"ImportPath": "github.com/gorilla/websocket",
+			"Comment": "v1.2.0-6-ga69d9f6",
+			"Rev": "a69d9f6de432e2c6b296a947d8a5ee88f68522cf"
+		},
+		{
 			"ImportPath": "golang.org/x/crypto/ssh/terminal",
 			"Rev": "b176d7def5d71bdd214203491f89843ed217f420"
 		},
