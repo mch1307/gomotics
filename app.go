@@ -7,6 +7,7 @@ import (
 
 	"github.com/mch1307/gomotics/config"
 	"github.com/mch1307/gomotics/server"
+	"github.com/mch1307/gomotics/ws"
 )
 
 var (
@@ -23,8 +24,14 @@ func main() {
 		fmt.Println("Invalid config file/path, file not found: ", err)
 		panic(err)
 	}
+	Sub(conf)
+}
+
+// Sub actually starts the servers
+func Sub(conf string) {
 	config.Initialize(conf)
 	s := server.Server{}
 	s.Initialize()
 	s.Run()
+	ws.Initialize()
 }
