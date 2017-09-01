@@ -82,7 +82,6 @@ func InitStubNHC() {
 		config.Conf.NhcConfig.Port, _ = strconv.Atoi(ConnectPort)
 		config.Conf.ServerConfig.ListenPort = 8081
 		config.Conf.ServerConfig.LogLevel = "DEBUG"
-		config.Conf.ServerConfig.LogPath = "c:\\temp"
 		log.Init()
 		go MockNHC()
 		go nhc.Listener()
