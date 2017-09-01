@@ -2,7 +2,6 @@ package server
 
 //TODO: review the http handling (return code, ...)
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -11,11 +10,15 @@ import (
 	"github.com/mch1307/gomotics/config"
 	"github.com/mch1307/gomotics/log"
 	"github.com/mch1307/gomotics/nhc"
+	"github.com/mch1307/gomotics/ws"
 
 	"github.com/gorilla/mux"
 )
 
+// HealthMsg static alive json for health endpoint
 const HealthMsg = `{"alive":true}`
+
+//var Clients *ClientPool
 
 // Server holds the gomotics app definition
 type Server struct {
@@ -44,9 +47,10 @@ func (s *Server) Initialize() {
 
 func (s *Server) intializeRoutes() {
 	s.Router.HandleFunc("/health", Health).Methods("GET")
-	s.Router.HandleFunc("/api/v1/nhc/", GetNhcItems).Methods("GET")
-	s.Router.HandleFunc("/api/v1/nhc/{id}", GetNhcItem).Methods("GET")
-	s.Router.HandleFunc("/api/v1/nhc/action", NhcCmd).Methods("PUT")
+	s.Router.HandleFunc("/api/v1/nhc/", nhc.GetNhcItems).Methods("GET")
+	s.Router.HandleFunc("/api/v1/nhc/{id}", nhc.GetNhcItem).Methods("GET")
+	s.Router.HandleFunc("/api/v1/nhc/action", nhc.NhcCmd).Methods("PUT")
+	s.Router.HandleFunc("/events", ws.ServeWebSocket).Methods("GET")
 
 	s.Router.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
 		t, err := route.GetPathTemplate()
@@ -64,6 +68,7 @@ func (s *Server) intializeRoutes() {
 			return err
 		}
 		fmt.Println(strings.Join(m, ","), t, p)
+		log.Info(strings.Join(m, ","), t, p)
 		return nil
 	})
 }
@@ -78,58 +83,4 @@ func (s *Server) Run() {
 func Health(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(HealthMsg))
-	//fmt.Fprintln(w, "Healthly!")
-}
-
-// NhcCmd endpoints for sending NHC commands
-func NhcCmd(w http.ResponseWriter, r *http.Request) {
-	vars := r.URL.Query()
-	id, err := strconv.Atoi(strings.Join(vars["id"], ""))
-	if err != nil {
-		fmt.Println("invalid request: id should be numeric")
-	}
-	val, err := strconv.Atoi(strings.Join(vars["value"], ""))
-	if err != nil {
-		fmt.Println("invalid request: value should be numeric")
-	}
-	var myCmd nhc.SimpleCmd
-	myCmd.Cmd = "executeactions"
-	myCmd.ID = id
-	myCmd.Value = val
-	nhc.SendCommand(myCmd.Stringify())
-	w.Write([]byte("Success"))
-}
-
-// GetNhcItems handler for /api/v1/nhc/
-func GetNhcItems(w http.ResponseWriter, r *http.Request) {
-	tmp := nhc.GetItems()
-	resp, _ := json.Marshal(tmp)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(resp)
-}
-
-// GetNhcItems handler for /api/v1/nhc/{id}
-func GetNhcItem(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	found := false
-	params := mux.Vars(r)
-	tmp := nhc.GetItems()
-	//fmt.Println("getnhcItem arg: ", params["id"])
-	var resp nhc.Item
-	for _, val := range tmp {
-		if i, _ := strconv.Atoi(params["id"]); val.ID == i {
-			fmt.Println("in if", params["id"], i)
-			resp = val
-			found = true
-		}
-	}
-	if !found {
-		fmt.Println("not found")
-		//http.Error(w, http.StatusNoContent, "no item matching given id found")
-		w.WriteHeader(http.StatusNoContent)
-		fmt.Fprint(w, string("no item matching given id found"))
-	} else {
-		rsp, _ := json.Marshal(resp)
-		w.Write(rsp)
-	}
 }

@@ -1,4 +1,4 @@
-// testutil pkg: set of utilities for facilitating tests
+// Package testutil pkg: set of utilities for facilitating tests
 // Only used for unit/integration tests
 package testutil
 
@@ -12,8 +12,12 @@ import (
 	"time"
 
 	"github.com/mch1307/gomotics/config"
+	"github.com/mch1307/gomotics/db"
+	"github.com/mch1307/gomotics/log"
 	"github.com/mch1307/gomotics/nhc"
 	"github.com/mch1307/gomotics/server"
+	"github.com/mch1307/gomotics/types"
+	"github.com/mch1307/gomotics/ws"
 )
 
 const (
@@ -35,13 +39,28 @@ var (
 	`
 	invalidNHCMsg = `{"event":"listactions","data":[{"i":1,"val":100}]}
 	`
-	failConf                                     = config.NhcConf{Host: "willFail", Port: 8000}
-	testConf                                     = config.NhcConf{Host: "localhost", Port: 8000}
-	command                                      = nhc.Event{ID: 1, Value: 100}
-	myCmd                                        nhc.SimpleCmd
-	fakeActionsMsg, fakeLocationsMsg, nhcMessage nhc.Message
+	failConf = config.NhcConf{Host: "willFail", Port: 8000}
+	testConf = config.NhcConf{Host: "localhost", Port: 8000}
+	command  = types.Event{ID: 1, Value: 100}
+	// MyCmd exported nhc.SimpleCmd
+	MyCmd                                        = nhc.SimpleCmd{Cmd: "executeactions", ID: 1, Value: 100}
+	fakeActionsMsg, fakeLocationsMsg, nhcMessage types.Message
 	popFakeRun, initRun                          bool
 )
+
+// Sessions type used for managin session in NHC Stub (listener vs commands)
+type Sessions []*Session
+
+// Clients holds client session list
+var Clients Sessions
+
+// Session type holds the NHC stub client connection
+type Session struct {
+	sType      string
+	connection net.Conn
+	reader     *bufio.Reader
+	writer     *bufio.Writer
+}
 
 // PopFakeNhc populates in mem db with fake data for UT
 func PopFakeNhc() {
@@ -51,7 +70,7 @@ func PopFakeNhc() {
 		nhc.Route(fakeLocationsMsg)
 		json.Unmarshal([]byte(actions), &fakeActionsMsg)
 		nhc.Route(fakeActionsMsg)
-		nhc.BuildItems()
+		db.BuildItems()
 		popFakeRun = true
 	}
 }
@@ -62,18 +81,19 @@ func InitStubNHC() {
 		config.Conf.NhcConfig.Host = ConnectHost
 		config.Conf.NhcConfig.Port, _ = strconv.Atoi(ConnectPort)
 		config.Conf.ServerConfig.ListenPort = 8081
+		config.Conf.ServerConfig.LogLevel = "DEBUG"
+		config.Conf.ServerConfig.LogPath = "c:\\temp"
+		log.Init()
 		go MockNHC()
 		go nhc.Listener()
 		time.Sleep(500 * time.Millisecond)
 		nhc.Init(&testConf)
 		// call twice to test update items in persit.go
 		nhc.Init(&testConf)
-		/* 	myCmd.Cmd = "executeactions"
-		   	myCmd.ID = 1
-			   myCmd.Value = 100 */
 		s := server.Server{}
 		s.Initialize()
 		go s.Run()
+		ws.Initialize()
 		initRun = true
 	}
 }
@@ -98,20 +118,6 @@ func MockNHC() {
 		// handle connection in goroutine
 		go client.Handle()
 	}
-}
-
-// Sessions type used for managin session in NHC Stub (listener vs commands)
-type Sessions []*Session
-
-// Clients holds client session list
-var Clients Sessions
-
-// Session type holds the NHC stub client connection
-type Session struct {
-	sType      string
-	connection net.Conn
-	reader     *bufio.Reader
-	writer     *bufio.Writer
 }
 
 // NewSession populates the Sessions (list of client connections) on client connect

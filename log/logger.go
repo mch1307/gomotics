@@ -52,6 +52,17 @@ func Debug(args ...interface{}) {
 	}).Debugln(args...)
 }
 
+// Debugf logs a message at level Debug on the standard logger.
+func Debugf(format string, args ...interface{}) {
+	moreInfo := retrieveCallInfo()
+	log.WithFields(log.Fields{
+		"filename": moreInfo.fileName,
+		"package":  moreInfo.packageName,
+		"function": moreInfo.funcName,
+		"line":     moreInfo.line,
+	}).Debugf(format, args...)
+}
+
 // Info logs a message at level Info on the standard logger.
 func Info(args ...interface{}) {
 	moreInfo := retrieveCallInfo()

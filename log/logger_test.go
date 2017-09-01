@@ -38,7 +38,7 @@ func init() {
 	}
 	config.Conf.ServerConfig.LogLevel = "DEBUG"
 	config.Conf.ServerConfig.LogPath = "."
-	Init()
+	//Init()
 	Debug("Init log testing")
 	//readLogs()
 }

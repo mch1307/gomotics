@@ -1,19 +1,23 @@
-package nhc
+package db
 
 import (
+	"encoding/json"
+
 	"github.com/mch1307/gomotics/log"
+	"github.com/mch1307/gomotics/types"
+	"github.com/mch1307/gomotics/ws"
 )
 
 var (
-	actionsColl   []Action
-	locationsColl []Location
-	items         []Item
+	actionsColl   []types.Action
+	locationsColl []types.Location
+	items         []types.Item
 )
 
 // BuildItems builds the collection of NHC items
 // "merges" actions and locations
 func BuildItems() {
-	var nhcItem Item
+	var nhcItem types.Item
 	// loop through NHC raw actions collection
 	// and build items collection
 	for _, rec := range actionsColl {
@@ -28,21 +32,8 @@ func BuildItems() {
 	log.Debug("itemsCollection built")
 }
 
-/* // NewItem instantiate new NhcItem
-func NewItem(provider string, id, state int) Item {
-	new := Item{}
-	nhcAction := GetAction(id)
-	new.Provider = provider
-	new.ID = id
-	new.Name = nhcAction.Name
-	new.State = state
-	loc := GetLocation(nhcAction.Location)
-	new.Location = loc.Name
-	return new
-} */
-
 // SaveAction insert/update action in collection
-func SaveAction(act Action) {
+func SaveAction(act types.Action) {
 	found := false
 	// first lookup if action already exist
 	if len(actionsColl) > 0 {
@@ -55,14 +46,15 @@ func SaveAction(act Action) {
 		}
 	}
 	if !found {
-		actionsColl = append(actionsColl, act)
 		log.Debug("Nhc ID %v not found -> inserted", act.ID)
+		actionsColl = append(actionsColl, act)
 	}
+
 }
 
 // GetAction gets nhc action from collection
-func GetAction(id int) Action {
-	var ret Action
+func GetAction(id int) types.Action {
+	var ret types.Action
 	for idx, val := range actionsColl {
 		if actionsColl[idx].ID == id {
 			log.Debug("Nhc ID %v found", id)
@@ -73,12 +65,26 @@ func GetAction(id int) Action {
 }
 
 // GetItems lists all NHC items from items collection
-func GetItems() []Item {
+func GetItems() []types.Item {
 	return items
 }
 
+// GetItem return specific item
+func GetItem(id int) (it types.Item, found bool) {
+	found = false
+	tmp := GetItems()
+	var resp types.Item
+	for _, val := range tmp {
+		if val.ID == id {
+			resp = val
+			found = true
+		}
+	}
+	return resp, found
+}
+
 // SaveLocation insert/update location in collection
-func SaveLocation(loc Location) {
+func SaveLocation(loc types.Location) {
 	// first lookup if action already exist
 	found := false
 	if len(locationsColl) > 0 {
@@ -97,8 +103,8 @@ func SaveLocation(loc Location) {
 }
 
 // GetLocation gets nhc action from collection
-func GetLocation(id int) Location {
-	var ret Location
+func GetLocation(id int) types.Location {
+	var ret types.Location
 	for idx, val := range locationsColl {
 		if locationsColl[idx].ID == id {
 			log.Debug("Nhc location with ID %v found", id)
@@ -109,7 +115,7 @@ func GetLocation(id int) Location {
 }
 
 // ProcessEvent saves new state of nhc equipment to relevant collections
-func ProcessEvent(evt Event) {
+func ProcessEvent(evt types.Event) {
 	for idx := range actionsColl {
 		if actionsColl[idx].ID == evt.ID {
 			actionsColl[idx].Value1 = evt.Value
@@ -120,5 +126,14 @@ func ProcessEvent(evt Event) {
 			items[idx].State = evt.Value
 		}
 	}
+	item, found := GetItem(evt.ID)
+	if found {
+		log.Debug("record found for item: ", evt.ID)
+		event, _ := json.Marshal(item)
+		ws.WSPool.Broadcast <- event
+	} else {
+		log.Debug("no record found: item ", evt.ID)
+	}
+
 	log.Debug("Nhc event processed for NHC action id:", evt.ID)
 }

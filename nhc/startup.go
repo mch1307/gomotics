@@ -5,10 +5,25 @@ import (
 	"fmt"
 
 	"github.com/mch1307/gomotics/config"
+	"github.com/mch1307/gomotics/db"
 	"github.com/mch1307/gomotics/log"
+	"github.com/mch1307/gomotics/types"
 )
 
-var nhcMessage Message
+const (
+	// RegisterCMD holds NHC startevents
+	RegisterCMD = "{\"cmd\":\"startevents\"}"
+	// ListActions holds NHC listactions
+	ListActions = "{\"cmd\":\"listactions\"}"
+	// ListLocations holds NHC listlocations
+	ListLocations = "{\"cmd\":\"listlocations\"}"
+	// ListEnergies holds NHC listenergy
+	ListEnergies = "{\"cmd\":\"listenergy\"}"
+	// ListThermostats holds NHC listthermostat
+	ListThermostats = "{\"cmd\":\"listthermostat\"}"
+)
+
+var nhcMessage types.Message
 
 // Init sends list commands to NHC in order to get all equipments
 func Init(cfg *config.NhcConf) {
@@ -34,6 +49,6 @@ func Init(cfg *config.NhcConf) {
 
 	defer conn.Close()
 	// Build the nhc collection
-	BuildItems()
+	db.BuildItems()
 	log.Info("Nhc init done")
 }
