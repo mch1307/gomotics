@@ -14,6 +14,7 @@ func init() {
 	// test failures
 	//go Init(&failConf)
 	testutil.InitStubNHC()
+	Dump()
 	//SendCommand(myCmd.Stringify())
 }
 func TestGetLocation(t *testing.T) {

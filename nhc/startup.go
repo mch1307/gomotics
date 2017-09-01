@@ -50,5 +50,8 @@ func Init(cfg *config.NhcConf) {
 	defer conn.Close()
 	// Build the nhc collection
 	db.BuildItems()
+	if config.Conf.ServerConfig.LogLevel == "DEBUG" {
+		db.Dump()
+	}
 	log.Info("Nhc init done")
 }

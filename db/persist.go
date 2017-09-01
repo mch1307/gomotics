@@ -137,3 +137,8 @@ func ProcessEvent(evt types.Event) {
 
 	log.Debug("Nhc event processed for NHC action id:", evt.ID)
 }
+
+func Dump() {
+	log.Debug("NHC actions: ", actionsColl)
+	log.Debug("NHC actions: ", locationsColl)
+}
