@@ -29,6 +29,7 @@ var origin = "http://localhost/"
 var url = "ws://localhost:8081/events"
 
 func Test_tWS(t *testing.T) {
+	retry := 0
 	tests := []struct {
 		name       string
 		id         int
@@ -42,7 +43,11 @@ func Test_tWS(t *testing.T) {
 	var msg types.Item
 	ws, _, err := websocket.DefaultDialer.Dial(url, nil)
 	if err != nil {
-		fmt.Println(err)
+		if retry == 0 {
+			testutil.InitStubNHC()
+		} else {
+			fmt.Println(err)
+		}
 	}
 	go func() {
 		//defer ws.Close()
@@ -65,7 +70,7 @@ func Test_tWS(t *testing.T) {
 		}
 	}()
 
-	time.Sleep(time.Second * 3)
+	time.Sleep(time.Second * 1)
 	for _, tt := range tests {
 		fmt.Println("start test ", tt.name)
 		//ws.WriteMessage(websocket.PingMessage, nil)
