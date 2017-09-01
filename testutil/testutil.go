@@ -75,9 +75,23 @@ func PopFakeNhc() {
 	}
 }
 
+func isTCPPortAvailable(port int) bool {
+	if port < 1024 || port > 65500 {
+		return false
+	}
+	conn, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", port))
+	if err != nil {
+		return false
+	}
+	conn.Close()
+	return true
+}
+
 // InitStubNHC initialize the NHC Stub and populates dummy data in mem 4 tests
 func InitStubNHC() {
-	if !initRun {
+	//_, err := net.Dial("tcp", "127.0.0.1:8081")
+	if isTCPPortAvailable(8081) {
+		fmt.Println("starting InitStubNHC")
 		config.Conf.NhcConfig.Host = ConnectHost
 		config.Conf.NhcConfig.Port, _ = strconv.Atoi(ConnectPort)
 		config.Conf.ServerConfig.ListenPort = 8081
@@ -94,6 +108,8 @@ func InitStubNHC() {
 		go s.Run()
 		ws.Initialize()
 		initRun = true
+	} else {
+		fmt.Println("already running")
 	}
 }
 
