@@ -33,7 +33,7 @@ type LogEntry struct {
 
 func init() {
 	config.Conf.ServerConfig.LogLevel = "DEBUG"
-	config.Conf.ServerConfig.LogPath = "c:\\temp"
+	config.Conf.ServerConfig.LogPath = "."
 	logFile = filepath.Join(config.Conf.ServerConfig.LogPath, "gomotics.log")
 	/* 	if err := os.Remove(logFile); err != nil {
 		fmt.Println("could not delete log file")
