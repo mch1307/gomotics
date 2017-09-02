@@ -1,6 +1,13 @@
 package testutil
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
+
+func init() {
+	fmt.Println("starting testutil test")
+}
 
 // TestPopFakeNhc dummy test for covering testutil pkg
 func TestPopFakeNhc(t *testing.T) {

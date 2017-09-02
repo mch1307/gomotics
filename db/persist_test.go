@@ -1,6 +1,7 @@
 package db_test
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 	"time"
@@ -13,6 +14,8 @@ import (
 func init() {
 	// test failures
 	//go Init(&failConf)
+
+	fmt.Println("starting db test")
 	testutil.InitStubNHC()
 	Dump()
 	//SendCommand(myCmd.Stringify())

@@ -32,6 +32,7 @@ type LogEntry struct {
 }
 
 func init() {
+	fmt.Println("starting log test")
 	config.Conf.ServerConfig.LogLevel = "DEBUG"
 	config.Conf.ServerConfig.LogPath = "."
 	logFile = filepath.Join(config.Conf.ServerConfig.LogPath, "gomotics.log")

@@ -21,6 +21,7 @@ var baseUrl string
 //const healthMsg = `{"alive":true}`
 
 func init() {
+	fmt.Println("starting server test")
 	baseUrl = "http://" + testutil.ConnectHost + ":8081"
 	testutil.InitStubNHC()
 }

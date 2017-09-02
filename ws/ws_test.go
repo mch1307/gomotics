@@ -21,6 +21,7 @@ var baseUrl string
 //const healthMsg = `{"alive":true}`
 
 func init() {
+	fmt.Println("starting ws test")
 	baseUrl = "http://" + testutil.ConnectHost + ":8081"
 	testutil.InitStubNHC()
 }
@@ -77,16 +78,16 @@ func Test_tWS(t *testing.T) {
 		cmd := testutil.MyCmd
 		cmd.ID = tt.id
 		cmd.Value = tt.exState
-		fmt.Println(cmd)
+		//fmt.Println(cmd)
 		time.Sleep(time.Millisecond * 500)
 		nhc.SendCommand(cmd.Stringify())
-		fmt.Println("sending: ", cmd.ID)
-		time.Sleep(time.Millisecond * 2000)
+		//fmt.Println("sending: ", cmd.ID)
+		time.Sleep(time.Millisecond * 800)
 
-		fmt.Println("msg ", msg.ID)
+		//fmt.Println("msg ", msg.ID)
 		if msg.ID == tt.id {
 			if msg.State != tt.exState {
-				fmt.Println("testing...")
+				//fmt.Println("testing...")
 				t.Error("test failed  ", tt.name, tt.id, msg.ID, tt.exName, msg.Name, tt.exState, msg.State)
 			}
 		}

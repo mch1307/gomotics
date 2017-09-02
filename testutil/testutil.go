@@ -13,7 +13,6 @@ import (
 
 	"github.com/mch1307/gomotics/config"
 	"github.com/mch1307/gomotics/db"
-	"github.com/mch1307/gomotics/log"
 	"github.com/mch1307/gomotics/nhc"
 	"github.com/mch1307/gomotics/server"
 	"github.com/mch1307/gomotics/types"
@@ -90,28 +89,27 @@ func isTCPPortAvailable(port int) bool {
 // InitStubNHC initialize the NHC Stub and populates dummy data in mem 4 tests
 func InitStubNHC() {
 	//_, err := net.Dial("tcp", "127.0.0.1:8081")
-	if isTCPPortAvailable(8081) {
+	if isTCPPortAvailable(8081) && isTCPPortAvailable(8000) {
 		fmt.Println("starting InitStubNHC")
 		config.Conf.NhcConfig.Host = ConnectHost
 		config.Conf.NhcConfig.Port, _ = strconv.Atoi(ConnectPort)
 		config.Conf.ServerConfig.ListenPort = 8081
 		config.Conf.ServerConfig.LogLevel = "DEBUG"
-	}
-	log.Init()
-	if isTCPPortAvailable(8000) {
 		go MockNHC()
 		go nhc.Listener()
 		time.Sleep(500 * time.Millisecond)
 		nhc.Init(&testConf)
 		// call twice to test update items in persit.go
 		nhc.Init(&testConf)
-	}
-	if isTCPPortAvailable(8081) {
 		s := server.Server{}
 		s.Initialize()
 		go s.Run()
 		ws.Initialize()
 		initRun = true
+	} else {
+		fmt.Println("waiting for port to be available for the next test")
+		time.Sleep(time.Millisecond * 500)
+		InitStubNHC()
 	}
 }
 
@@ -158,20 +156,20 @@ func (session *Session) Handle() {
 		if len(message) > 0 {
 			_ = json.Unmarshal(message, &nhcMessage)
 			if nhcMessage.Cmd == "startevents" {
-				fmt.Println("Listener session")
+				//fmt.Println("Listener session")
 				session.sType = "listener"
 				session.connection.Write([]byte(startEvents))
 				//session.connection.Write([]byte(invalidMsg))
 			} else if nhcMessage.Cmd == "listactions" {
-				fmt.Println("Actions: ", nhcMessage.Cmd, nhcMessage.Event, session.sType)
+				//fmt.Println("Actions: ", nhcMessage.Cmd, nhcMessage.Event, session.sType)
 				session.connection.Write([]byte(actions))
 				nhcMessage.Cmd = "dropme"
 			} else if nhcMessage.Cmd == "listlocations" {
-				fmt.Println("Location: ", nhcMessage.Cmd, nhcMessage.Event, session.sType)
+				//fmt.Println("Location: ", nhcMessage.Cmd, nhcMessage.Event, session.sType)
 				session.connection.Write([]byte(locations))
 				nhcMessage.Cmd = "dropme"
 			} else if nhcMessage.Cmd == "executeactions" {
-				fmt.Println("Event: ", nhcMessage.Cmd, nhcMessage.Event, session.sType)
+				//fmt.Println("Event: ", nhcMessage.Cmd, nhcMessage.Event, session.sType)
 				for _, cli := range Clients {
 					if cli.sType == "listener" {
 						cli.connection.Write([]byte(actionEvent))

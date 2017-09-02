@@ -1,11 +1,15 @@
 package config
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 	//. "github.com/mch1307/gomotics/config"
 )
 
+func init() {
+	fmt.Println("starting config test")
+}
 func TestInitialize(t *testing.T) {
 	var cfg GlobalConfig
 	cfg.NhcConfig.Host = "localhost"

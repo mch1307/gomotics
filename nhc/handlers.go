@@ -49,13 +49,13 @@ func GetNhcItem(w http.ResponseWriter, r *http.Request) {
 	var resp types.Item
 	for _, val := range tmp {
 		if i, _ := strconv.Atoi(params["id"]); val.ID == i {
-			fmt.Println("in if", params["id"], i)
+			//fmt.Println("in if", params["id"], i)
 			resp = val
 			found = true
 		}
 	}
 	if !found {
-		fmt.Println("not found")
+		//fmt.Println("not found")
 		//http.Error(w, http.StatusNoContent, "no item matching given id found")
 		w.WriteHeader(http.StatusNoContent)
 		fmt.Fprint(w, string("no item matching given id found"))
