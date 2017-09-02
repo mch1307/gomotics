@@ -30,7 +30,7 @@ var origin = "http://localhost/"
 var url = "ws://localhost:8081/events"
 
 func Test_tWS(t *testing.T) {
-	retry := 0
+	//retry := 0
 	tests := []struct {
 		name       string
 		id         int
@@ -42,17 +42,17 @@ func Test_tWS(t *testing.T) {
 		{"action1", 1, "power switch", "Kitchen", 100},
 	}
 	var msg types.Item
-	ws, _, err := websocket.DefaultDialer.Dial(url, nil)
+	ws, _, err := websocket.DefaultDialer.Dial(baseUrl, nil)
 	if err != nil {
-		if retry == 0 {
+		/* 		if retry == 0 {
 			fmt.Println("Retrying InitStubNHC once due to error: ", err)
 			testutil.InitStubNHC()
-		} else {
-			fmt.Println(err)
-		}
+		} else { */
+		fmt.Println(err)
+		//		}
 	}
 	go func() {
-		defer ws.Close()
+		//defer ws.Close()
 		//var tmp = make([]byte, 512)
 		for {
 			_, tmp, err := ws.ReadMessage()
