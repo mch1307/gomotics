@@ -32,15 +32,16 @@ var url = "ws://localhost:8081/events"
 func wsDial(url string) (wsConn *websocket.Conn, ok bool, err error) {
 	webS, _, err := websocket.DefaultDialer.Dial(url, nil)
 	if err != nil {
+		fmt.Println("error connecting ws")
 		return webS, false, err
 	}
 	return webS, true, nil
-
 }
 
 func Test_tWS(t *testing.T) {
 	retry := 0
 	ok := false
+	ctl := 0
 	var err error
 	var wsConn *websocket.Conn
 	tests := []struct {
@@ -53,6 +54,7 @@ func Test_tWS(t *testing.T) {
 		{"action0", 0, "light", "Living Room", 0},
 		{"action1", 1, "power switch", "Kitchen", 100},
 	}
+	fmt.Println("# tests: ", len(tests))
 	var msg types.Item
 	if wsConn, ok, err = wsDial(url); !ok {
 		if retry < 11 {
@@ -96,6 +98,7 @@ func Test_tWS(t *testing.T) {
 			log.Debug("ws reads ", msg)
 
 		}
+		defer wsConn.Close()
 	}()
 
 	time.Sleep(time.Second * 1)
@@ -106,22 +109,24 @@ func Test_tWS(t *testing.T) {
 		cmd.ID = tt.id
 		cmd.Value = tt.exState
 		//fmt.Println(cmd)
-		time.Sleep(time.Millisecond * 500)
+		//time.Sleep(time.Millisecond * 500)
 		nhc.SendCommand(cmd.Stringify())
 		//fmt.Println("sending: ", cmd.ID)
-		time.Sleep(time.Millisecond * 800)
+		time.Sleep(time.Millisecond * 900)
 
-		//fmt.Println("msg ", msg.ID)
+		fmt.Println("msg ", msg.ID)
 		if msg.ID == tt.id {
 			if msg.State != tt.exState {
 				//fmt.Println("testing...")
 				t.Error("test failed  ", tt.name, tt.id, msg.ID, tt.exName, msg.Name, tt.exState, msg.State)
 			}
+			ctl++
 		}
 		/* 		if msg.ID == 1 {
 			fmt.Println("abnormal connection")
 			ws.WriteMessage(websocket.CloseAbnormalClosure, nil)
 		} */
 	}
-
+	defer wsConn.Close()
+	fmt.Println("tests ok: ", ctl)
 }
