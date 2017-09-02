@@ -45,6 +45,7 @@ var (
 	MyCmd                                        = nhc.SimpleCmd{Cmd: "executeactions", ID: 1, Value: 100}
 	fakeActionsMsg, fakeLocationsMsg, nhcMessage types.Message
 	popFakeRun, initRun                          bool
+	retries                                      = 0
 )
 
 // Sessions type used for managin session in NHC Stub (listener vs commands)
@@ -88,6 +89,7 @@ func isTCPPortAvailable(port int) bool {
 
 // InitStubNHC initialize the NHC Stub and populates dummy data in mem 4 tests
 func InitStubNHC() {
+
 	//_, err := net.Dial("tcp", "127.0.0.1:8081")
 	if isTCPPortAvailable(8081) && isTCPPortAvailable(8000) {
 		fmt.Println("starting InitStubNHC")
@@ -107,8 +109,12 @@ func InitStubNHC() {
 		ws.Initialize()
 		initRun = true
 	} else {
-		fmt.Println("waiting for port to be available for the next test")
-		time.Sleep(time.Millisecond * 500)
+		retries++
+		if retries > 120 {
+			return
+		}
+		fmt.Println("waiting for port to be available for the next test. Retries: ", retries)
+		time.Sleep(time.Millisecond * 1000)
 		InitStubNHC()
 	}
 }
