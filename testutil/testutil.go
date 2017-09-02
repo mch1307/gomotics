@@ -96,20 +96,22 @@ func InitStubNHC() {
 		config.Conf.NhcConfig.Port, _ = strconv.Atoi(ConnectPort)
 		config.Conf.ServerConfig.ListenPort = 8081
 		config.Conf.ServerConfig.LogLevel = "DEBUG"
-		log.Init()
+	}
+	log.Init()
+	if isTCPPortAvailable(8000) {
 		go MockNHC()
 		go nhc.Listener()
 		time.Sleep(500 * time.Millisecond)
 		nhc.Init(&testConf)
 		// call twice to test update items in persit.go
 		nhc.Init(&testConf)
+	}
+	if isTCPPortAvailable(8081) {
 		s := server.Server{}
 		s.Initialize()
 		go s.Run()
 		ws.Initialize()
 		initRun = true
-	} else {
-		fmt.Println("already running")
 	}
 }
 
