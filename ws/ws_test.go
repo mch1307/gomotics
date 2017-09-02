@@ -45,13 +45,14 @@ func Test_tWS(t *testing.T) {
 	ws, _, err := websocket.DefaultDialer.Dial(url, nil)
 	if err != nil {
 		if retry == 0 {
+			fmt.Println("Retrying InitStubNHC once due to error: ", err)
 			testutil.InitStubNHC()
 		} else {
 			fmt.Println(err)
 		}
 	}
 	go func() {
-		//defer ws.Close()
+		defer ws.Close()
 		//var tmp = make([]byte, 512)
 		for {
 			_, tmp, err := ws.ReadMessage()
