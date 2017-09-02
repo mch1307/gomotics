@@ -9,6 +9,8 @@ go:
 before_install:
   - go get github.com/mattn/goveralls
   - rm -rf ./dist
+  - export COVERALLS_PARALLEL=false
+  - export GOMAXPROCS=1
 script:
   - $HOME/gopath/bin/goveralls -service=travis-ci
 after_success:
