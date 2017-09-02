@@ -29,8 +29,20 @@ func init() {
 var origin = "http://localhost/"
 var url = "ws://localhost:8081/events"
 
+func wsDial(url string) (wsConn *websocket.Conn, ok bool, err error) {
+	webS, _, err := websocket.DefaultDialer.Dial(url, nil)
+	if err != nil {
+		return webS, false, err
+	}
+	return webS, true, nil
+
+}
+
 func Test_tWS(t *testing.T) {
 	retry := 0
+	ok := false
+	var err error
+	var wsConn *websocket.Conn
 	tests := []struct {
 		name       string
 		id         int
@@ -42,22 +54,34 @@ func Test_tWS(t *testing.T) {
 		{"action1", 1, "power switch", "Kitchen", 100},
 	}
 	var msg types.Item
-	ws, _, err := websocket.DefaultDialer.Dial(url, nil)
-	if err != nil {
+	if wsConn, ok, err = wsDial(url); !ok {
 		if retry < 11 {
 			retry++
-			fmt.Println("Retrying websocket conncet  due to error: ", err)
+			fmt.Println("Retrying websocket connect due to error: ", err)
 			fmt.Println("Attempt # ", retry)
-			testutil.InitStubNHC()
+			time.Sleep(time.Second * 1)
+			Test_tWS(t)
 		} else {
-			fmt.Println(err)
+			fmt.Println("Could not connect after 10 attempts, err: ", err)
+			return
 		}
 	}
+	/* 	ws, ok, err := wsDial(url)
+	   	if !ok {
+	   		if retry < 11 {
+	   			retry++
+	   			fmt.Println("Retrying websocket conncet  due to error: ", err)
+	   			fmt.Println("Attempt # ", retry)
+	   			testutil.InitStubNHC()
+	   		} else {
+	   			fmt.Println("Could not connect after 10 attempts, err: ", err)
+	   		}
+	   	} */
 	go func() {
 		//defer ws.Close()
 		//var tmp = make([]byte, 512)
 		for {
-			_, tmp, err := ws.ReadMessage()
+			_, tmp, err := wsConn.ReadMessage()
 			if err != nil {
 				log.Error("read:", err)
 				return
