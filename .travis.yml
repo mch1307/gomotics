@@ -12,6 +12,6 @@ before_install:
   - export COVERALLS_PARALLEL=false
   - export GOMAXPROCS=1
 script:
-  - $HOME/gopath/bin/goveralls -service=travis-ci -flags -v
+  - $HOME/gopath/bin/goveralls -service=travis-ci -flags -v -p 1
 after_success:
   - test -n "$TRAVIS_TAG" && curl -sL https://git.io/goreleaser | bash  
