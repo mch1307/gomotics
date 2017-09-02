@@ -4,11 +4,9 @@ package server_test
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 
 	"github.com/mch1307/gomotics/nhc"
 	. "github.com/mch1307/gomotics/server"
@@ -80,11 +78,11 @@ func Test_getNhcItems(t *testing.T) {
 	}
 }
 
-func Test_nhcCmd(t *testing.T) {
+/* func Test_nhcCmd(t *testing.T) {
 	expected := "Success"
 	url := baseUrl + "/api/v1/nhc/action?id=1&value=100"
 	hCli := http.Client{
-		Timeout: time.Second * 5,
+		Timeout: time.Second * 2,
 	}
 	req, err := http.NewRequest(http.MethodPut, url, nil)
 	if err != nil {
@@ -104,4 +102,4 @@ func Test_nhcCmd(t *testing.T) {
 		t.Errorf("Test_nhcCmd failed, expecting %v, got %v", expected, string(got))
 	}
 
-}
+} */
