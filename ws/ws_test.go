@@ -53,6 +53,7 @@ func Test_tWS(t *testing.T) {
 	}
 	//fmt.Println("# tests: ", len(tests))
 	var msg types.Item
+	time.Sleep(time.Second * 2)
 	if wsConn, ok, err = wsDial(url); !ok {
 		if retry < 11 {
 			retry++
