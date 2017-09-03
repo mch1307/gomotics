@@ -60,7 +60,7 @@ func TestGetItems(t *testing.T) {
 		exVal int
 	}{
 		{"fakeSwitch", 1, 100},
-		{"fakeSwitch", 1, 0},
+		{"fakeSwitch", 3, 0},
 	}
 	nhc.SendCommand(testutil.MyCmd.Stringify())
 	time.Sleep(300 * time.Millisecond)
