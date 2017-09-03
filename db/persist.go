@@ -46,7 +46,7 @@ func SaveAction(act types.Action) {
 		}
 	}
 	if !found {
-		log.Debug("Nhc ID %v not found -> inserted", act.ID)
+		log.Debugf("Nhc ID %v not found -> inserted", act.ID)
 		actionsColl = append(actionsColl, act)
 	}
 
@@ -57,7 +57,7 @@ func GetAction(id int) types.Action {
 	var ret types.Action
 	for idx, val := range actionsColl {
 		if actionsColl[idx].ID == id {
-			log.Debug("Nhc ID %v found", id)
+			log.Debugf("Nhc ID %v found", id)
 			ret = val
 		}
 	}
@@ -91,7 +91,7 @@ func SaveLocation(loc types.Location) {
 		for idx, item := range locationsColl {
 			if item.ID == loc.ID {
 				locationsColl[idx] = loc
-				log.Debug("Nhc location with ID %v found and updated", loc.ID)
+				log.Debugf("Nhc location with ID %v found and updated", loc.ID)
 				found = true
 			}
 		}
@@ -107,7 +107,7 @@ func GetLocation(id int) types.Location {
 	var ret types.Location
 	for idx, val := range locationsColl {
 		if locationsColl[idx].ID == id {
-			log.Debug("Nhc location with ID %v found", id)
+			log.Debugf("Nhc location with ID %v found", id)
 			ret = val
 		}
 	}
