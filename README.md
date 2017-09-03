@@ -9,6 +9,11 @@ Work In Progress
 
 Go backend for interfacing different domotics components/systems
 
-First feature (goal): Niko Home Control
+More information on https://blog.csnet.me/gomotics/
 
-Then: link with Jeedom
+First feature : Niko Home Control
+
+"Roadmap": 
+
+* GUI
+* link with Jeedom
