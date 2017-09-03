@@ -16,7 +16,6 @@ import (
 	"github.com/mch1307/gomotics/nhc"
 	"github.com/mch1307/gomotics/server"
 	"github.com/mch1307/gomotics/types"
-	"github.com/mch1307/gomotics/ws"
 )
 
 const (
@@ -26,7 +25,7 @@ const (
 )
 
 var (
-	actions = `{"cmd":"listactions","data":[{"id":0,"name":"light","type":1,"location":1,"value1":0},{"id":1,"name":"power switch","type":1,"location":2,"value1":0}]}
+	actions = `{"cmd":"listactions","data":[{"id":0,"name":"light","type":1,"location":1,"value1":0},{"id":1,"name":"power switch","type":1,"location":2,"value1":0},{"id":3,"name":"light","type":1,"location":1,"value1":0}]}
 	`
 	locations = `{"cmd":"listlocations","data":[{"id":0,"name":""},{"id":1,"name":"Living Room"},{"id":2,"name":"Kitchen"}]}
 	`
@@ -67,9 +66,9 @@ func PopFakeNhc() {
 
 	if !popFakeRun {
 		json.Unmarshal([]byte(locations), &fakeLocationsMsg)
-		nhc.Route(fakeLocationsMsg)
+		nhc.Route(&fakeLocationsMsg)
 		json.Unmarshal([]byte(actions), &fakeActionsMsg)
-		nhc.Route(fakeActionsMsg)
+		nhc.Route(&fakeActionsMsg)
 		db.BuildItems()
 		popFakeRun = true
 	}
@@ -100,13 +99,13 @@ func InitStubNHC() {
 		go MockNHC()
 		go nhc.Listener()
 		time.Sleep(500 * time.Millisecond)
-		nhc.Init(&testConf)
+		//nhc.Init(&testConf)
 		// call twice to test update items in persit.go
-		nhc.Init(&testConf)
+		//nhc.Init(&testConf)
 		s := server.Server{}
 		s.Initialize()
 		go s.Run()
-		ws.Initialize()
+		//ws.Initialize()
 		initRun = true
 	} else {
 		retries++

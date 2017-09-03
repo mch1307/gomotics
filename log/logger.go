@@ -39,6 +39,7 @@ func Init() {
 		panic(err)
 	}
 	log.SetOutput(file)
+	log.Info("logger initialized")
 }
 
 // Debug logs a message at level Debug on the standard logger.

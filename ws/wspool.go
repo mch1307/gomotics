@@ -1,13 +1,12 @@
 package ws
 
 import "github.com/mch1307/gomotics/log"
+import "fmt"
 
 // WSPool instance to hold ClientPool
 var WSPool *ClientPool
 
-// Initialize instantiate a ClientPool at startup (through init)
-// the start the Run process
-func Initialize() {
+func init() {
 	WSPool = newClientPool()
 	go WSPool.Run()
 }
@@ -39,6 +38,7 @@ func newClientPool() *ClientPool {
 // Run activates the ClientPool so that we can manage
 // client connections
 func (cp *ClientPool) Run() {
+	fmt.Println("WSPool run starting")
 	for {
 		select {
 		case client := <-cp.register:

@@ -38,14 +38,14 @@ func Init(cfg *config.NhcConf) {
 	if err := reader.Decode(&nhcMessage); err != nil {
 		log.Fatalf("Unable to parse NHC ListLocations message: %v", err)
 	}
-	Route(nhcMessage)
+	Route(&nhcMessage)
 
 	// sends listActions command to NHC
 	fmt.Fprintf(conn, ListActions+"\n")
 	if err := reader.Decode(&nhcMessage); err != nil {
 		log.Fatalf("Unable to parse NHC ListActions message: %v", err)
 	}
-	Route(nhcMessage)
+	Route(&nhcMessage)
 
 	defer conn.Close()
 	// Build the nhc collection

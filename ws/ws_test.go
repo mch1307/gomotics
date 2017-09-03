@@ -8,17 +8,13 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
+	"github.com/mch1307/gomotics/db"
 	"github.com/mch1307/gomotics/log"
-	"github.com/mch1307/gomotics/nhc"
 	"github.com/mch1307/gomotics/testutil"
 	"github.com/mch1307/gomotics/types"
-	//. "github.com/mch1307/gomotics/ws"
-	//"golang.org/x/net/websocket"
 )
 
 var baseUrl string
-
-//const healthMsg = `{"alive":true}`
 
 func init() {
 	fmt.Println("starting ws test")
@@ -32,9 +28,10 @@ var url = "ws://localhost:8081/events"
 func wsDial(url string) (wsConn *websocket.Conn, ok bool, err error) {
 	webS, _, err := websocket.DefaultDialer.Dial(url, nil)
 	if err != nil {
-		fmt.Println("error connecting ws")
+		fmt.Println("error connecting ws", err)
 		return webS, false, err
 	}
+	//fmt.Println("websocket connect ok")
 	return webS, true, nil
 }
 
@@ -51,10 +48,10 @@ func Test_tWS(t *testing.T) {
 		exLocation string
 		exState    int
 	}{
-		{"action0", 0, "light", "Living Room", 0},
+		{"action0", 3, "light", "Living Room", 0},
 		{"action1", 1, "power switch", "Kitchen", 100},
 	}
-	fmt.Println("# tests: ", len(tests))
+	//fmt.Println("# tests: ", len(tests))
 	var msg types.Item
 	if wsConn, ok, err = wsDial(url); !ok {
 		if retry < 11 {
@@ -68,17 +65,8 @@ func Test_tWS(t *testing.T) {
 			return
 		}
 	}
-	/* 	ws, ok, err := wsDial(url)
-	   	if !ok {
-	   		if retry < 11 {
-	   			retry++
-	   			fmt.Println("Retrying websocket conncet  due to error: ", err)
-	   			fmt.Println("Attempt # ", retry)
-	   			testutil.InitStubNHC()
-	   		} else {
-	   			fmt.Println("Could not connect after 10 attempts, err: ", err)
-	   		}
-	   	} */
+
+	//time.Sleep(time.Second * 2)
 	go func() {
 		//defer ws.Close()
 		//var tmp = make([]byte, 512)
@@ -89,44 +77,37 @@ func Test_tWS(t *testing.T) {
 				return
 			}
 			log.Error(string(tmp))
-
 			err = json.Unmarshal(bytes.TrimSpace(tmp), &msg)
 			if err != nil {
 				log.Error("err parsing: ", err)
 				log.Error(string(tmp))
 			}
-			log.Debug("ws reads ", msg)
+			//fmt.Println("ws reads ", msg)
 
 		}
-		defer wsConn.Close()
 	}()
 
-	time.Sleep(time.Second * 1)
+	time.Sleep(time.Second * 3)
 	for _, tt := range tests {
 		fmt.Println("start test ", tt.name)
 		//ws.WriteMessage(websocket.PingMessage, nil)
-		cmd := testutil.MyCmd
-		cmd.ID = tt.id
-		cmd.Value = tt.exState
+		/* 		cmd := testutil.MyCmd
+		   		cmd.ID = tt.id
+		   		cmd.Value = tt.exState */
 		//fmt.Println(cmd)
-		//time.Sleep(time.Millisecond * 500)
-		nhc.SendCommand(cmd.Stringify())
-		//fmt.Println("sending: ", cmd.ID)
-		time.Sleep(time.Millisecond * 900)
+		time.Sleep(time.Millisecond * 500)
+		var evt types.Event
+		evt.ID = tt.id
+		evt.Value = tt.exState
+		db.ProcessEvent(evt)
+		time.Sleep(time.Millisecond * 500)
 
-		fmt.Println("msg ", msg.ID)
-		if msg.ID == tt.id {
-			if msg.State != tt.exState {
-				//fmt.Println("testing...")
-				t.Error("test failed  ", tt.name, tt.id, msg.ID, tt.exName, msg.Name, tt.exState, msg.State)
-			}
-			ctl++
+		//fmt.Println("msg ", msg.ID)
+		if msg.ID != tt.id || (msg.State != tt.exState) {
+			t.Error("test failed  ", tt.name, tt.id, msg.ID, tt.exName, msg.Name, tt.exState, msg.State)
 		}
-		/* 		if msg.ID == 1 {
-			fmt.Println("abnormal connection")
-			ws.WriteMessage(websocket.CloseAbnormalClosure, nil)
-		} */
+		ctl++
 	}
 	defer wsConn.Close()
-	fmt.Println("tests ok: ", ctl)
+	//fmt.Println("tests ok: ", ctl)
 }

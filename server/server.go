@@ -29,7 +29,7 @@ type Server struct {
 }
 
 func init() {
-	log.Init()
+	//log.Init()
 	log.Info("Starting gomotics")
 }
 

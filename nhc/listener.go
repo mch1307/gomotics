@@ -31,7 +31,7 @@ func Listener() {
 			nhcMessage.Cmd = "dropme"
 		} else {
 			log.Debug("received ", &nhcMessage.Cmd)
-			Route(nhcMessage)
+			Route(&nhcMessage)
 		}
 	}
 }

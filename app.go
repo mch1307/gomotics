@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/mch1307/gomotics/log"
+
 	"github.com/mch1307/gomotics/config"
+	"github.com/mch1307/gomotics/nhc"
 	"github.com/mch1307/gomotics/server"
-	"github.com/mch1307/gomotics/ws"
 )
 
 var (
@@ -30,8 +32,9 @@ func main() {
 // Sub actually starts the servers
 func Sub(conf string) {
 	config.Initialize(conf)
+	log.Init()
 	s := server.Server{}
 	s.Initialize()
 	s.Run()
-	ws.Initialize()
+	nhc.Init(&config.Conf.NhcConfig)
 }

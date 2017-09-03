@@ -41,6 +41,7 @@ var Conf GlobalConfig
 
 // Initialize populates the Conf variable
 func Initialize(cfg string) error {
+	fmt.Println("config file: ", cfg)
 	var err error
 	if _, err := toml.DecodeFile(cfg, &Conf); err != nil {
 		fmt.Println(err)

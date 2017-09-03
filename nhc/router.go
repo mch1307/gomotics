@@ -15,7 +15,7 @@ var (
 )
 
 // Route parse and route incoming message the right handler
-func Route(msg types.Message) {
+func Route(msg *types.Message) {
 	if msg.Cmd == "listlocations" {
 		/* Commented err handling as all incoming msg have already been json parsed once */
 		/* 		if err := json.Unmarshal(msg.Data, &nhcLocations); err != nil {
@@ -39,9 +39,10 @@ func Route(msg types.Message) {
 		/* 		if err := json.Unmarshal(msg.Data, &nhcEvent); err != nil {
 			log.Errorf("unable to parse message %v, err: %v", msg.Data, err)
 		} */
+		msg.Event = "dropme"
 		_ = json.Unmarshal(msg.Data, &nhcEvent)
-		for idx := range nhcEvent {
-			db.ProcessEvent(nhcEvent[idx])
+		for _, rec := range nhcEvent {
+			db.ProcessEvent(rec)
 			//db.SaveItem(nhcEvent[idx])
 		}
 	}

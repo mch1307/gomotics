@@ -127,14 +127,13 @@ func ProcessEvent(evt types.Event) {
 		}
 	}
 	item, found := GetItem(evt.ID)
+
 	if found {
-		log.Debug("record found for item: ", evt.ID)
 		event, _ := json.Marshal(item)
 		ws.WSPool.Broadcast <- event
 	} else {
 		log.Debug("no record found: item ", evt.ID)
 	}
-
 	log.Debug("Nhc event processed for NHC action id:", evt.ID)
 }
 

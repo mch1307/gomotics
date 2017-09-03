@@ -32,6 +32,7 @@ func SendCommand(cmd string) error {
 	conn, _ := ConnectNhc(&config.Conf.NhcConfig)
 	// no error handling as connect will exit in case of issue
 	log.Debug("received command: ", cmd)
+	fmt.Println("received command: ", cmd)
 	fmt.Fprintf(conn, cmd+"\n")
 	return nil
 }
