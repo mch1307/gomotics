@@ -9,7 +9,7 @@ import (
 func TestDiscover(t *testing.T) {
 	tests := []struct {
 		name string
-		want *net.TCPAddr
+		want *net.IP
 	}{
 		{"no nhc on LAN", nil},
 	}
