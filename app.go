@@ -2,8 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
-	"os"
 
 	"github.com/mch1307/gomotics/log"
 
@@ -22,10 +20,6 @@ func init() {
 
 func main() {
 	flag.Parse()
-	if _, err := os.Stat(conf); err != nil {
-		fmt.Println("Invalid config file/path, file not found: ", err)
-		panic(err)
-	}
 	Sub(conf)
 }
 

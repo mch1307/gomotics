@@ -27,6 +27,18 @@ var nhcMessage types.Message
 
 // Init sends list commands to NHC in order to get all equipments
 func Init(cfg *config.NhcConf) {
+	if len(cfg.Host) == 0 {
+		log.Debug("no nhc host in conf, starting discovery")
+		nhcHost := Discover()
+		log.Debug("discover returned ", nhcHost)
+		config.Conf.NhcConfig.Host = nhcHost.String()
+		cfg.Host = config.Conf.NhcConfig.Host
+	}
+	if cfg.Port == 0 {
+		config.Conf.NhcConfig.Port = 8000
+		cfg.Port = config.Conf.NhcConfig.Port
+
+	}
 	conn, err := ConnectNhc(cfg)
 	if err != nil {
 		log.Fatalf("Unable to connect to NHC host: %v. Error: %v", cfg.Host, err)
