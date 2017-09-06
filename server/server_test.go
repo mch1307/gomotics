@@ -4,9 +4,11 @@ package server_test
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/mch1307/gomotics/nhc"
 	. "github.com/mch1307/gomotics/server"
@@ -38,6 +40,7 @@ func TestHealth(t *testing.T) {
 
 }
 
+// TODO: add more test cases (test non existing item)
 func Test_getNhcItem(t *testing.T) {
 	req, err := http.NewRequest("GET", baseUrl+"/api/v1/nhc/99", nil)
 	if err != nil {
@@ -78,7 +81,7 @@ func Test_getNhcItems(t *testing.T) {
 	}
 }
 
-/* func Test_nhcCmd(t *testing.T) {
+func Test_nhcCmd(t *testing.T) {
 	expected := "Success"
 	url := baseUrl + "/api/v1/nhc/action?id=1&value=100"
 	hCli := http.Client{
@@ -102,4 +105,4 @@ func Test_getNhcItems(t *testing.T) {
 		t.Errorf("Test_nhcCmd failed, expecting %v, got %v", expected, string(got))
 	}
 
-} */
+}
