@@ -32,7 +32,7 @@ func TestInitialize(t *testing.T) {
 	}{
 		{"read conf - listen port", "test.toml", false, cfg},
 		{"read conf - nhc host", "test.toml", false, cfg},
-		{"read conf - error", "NoSuchFile", false, cfgDefault},
+		{"read conf - no file", "NoSuchFile", false, cfgDefault},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -42,6 +42,7 @@ func TestInitialize(t *testing.T) {
 			}
 			Conf.NhcConfig.Host = ""
 			Conf.NhcConfig.Port = 0
+			Conf.ServerConfig.LogLevel = ""
 		})
 	}
 }
