@@ -41,20 +41,23 @@ type GlobalConfig struct {
 var Conf GlobalConfig
 
 // Initialize populates the Conf variable
-func Initialize(cfg string) error {
-	var err error
+func Initialize(cfg string) {
+
 	if _, err := os.Stat(cfg); err != nil {
 		fmt.Println("Invalid config file/path: ", err)
 		wrkDir, _ := os.Getwd()
-		Conf.ServerConfig.ListenPort = 8081
-		Conf.ServerConfig.LogLevel = "INFO"
 		Conf.ServerConfig.LogPath = wrkDir
-		fmt.Printf("Starting with default config: %+v", Conf.ServerConfig)
-		fmt.Println(" ")
 	} else {
 		if _, err := toml.DecodeFile(cfg, &Conf); err != nil {
-			return err
+			fmt.Println("Error parsing config file: ", err)
 		}
 	}
-	return err
+	if Conf.ServerConfig.ListenPort == 0 {
+		Conf.ServerConfig.ListenPort = 8081
+	}
+	if len(Conf.ServerConfig.LogLevel) == 0 {
+		Conf.ServerConfig.LogLevel = "INFO"
+	}
+	fmt.Printf("Starting with config: %+v", Conf.ServerConfig)
+	fmt.Println(" ")
 }
