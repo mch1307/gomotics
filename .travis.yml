@@ -8,7 +8,7 @@ go:
   - tip
 before_install:
   - go get github.com/mattn/goveralls
-  - ls -l ./dist
+  - ls -l /dist
   - rm -rf ./dist
   - export COVERALLS_PARALLEL=false
   - export GOMAXPROCS=1
