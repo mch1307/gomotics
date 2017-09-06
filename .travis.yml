@@ -6,14 +6,22 @@ install: true
 sudo: required
 go:
   - tip
+services:
+  - docker
 before_install:
   - go get github.com/mattn/goveralls
-  - ls -l /dist
   - rm -rf ./dist
   - export COVERALLS_PARALLEL=false
   - export GOMAXPROCS=1
 script:
   - $HOME/gopath/bin/goveralls -v -service=travis-ci
-  - ls -lrt /dist
 after_success:
   - test -n "$TRAVIS_TAG" && curl -sL https://git.io/goreleaser | bash  
+  - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+  - export REPO=$DOCKER_USER/gomotics
+  - export TAG=`if [ “$TRAVIS_BRANCH” == “master” ]; then echo “latest”; else echo $TRAVIS_TAG ; fi`
+  - echo $REPO:$TAG:$COMMIT
+  - docker build -f Dockerfile -t $REPO:$COMMIT .
+  - docker tag $REPO:$COMMIT $REPO:$TAG
+  - docker tag $REPO:$COMMIT $REPO:travis-$TRAVIS_BUILD_NUMBER
+  - docker push $REPO
