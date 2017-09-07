@@ -7,6 +7,7 @@ ENV SERVICE_HOME=/gomotics
 RUN mkdir -p ${SERVICE_HOME}/etc ${SERVICE_HOME}/log 
 ADD "./dist/gomotics" "/bin/gomotics"
 EXPOSE 8081
+EXPOSE 18043/udp
 WORKDIR $SERVICE_HOME/log
 VOLUME /gomotics/log
 ENTRYPOINT ["/bin/gomotics"]
