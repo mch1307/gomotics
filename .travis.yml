@@ -11,11 +11,10 @@ services:
 before_install:
   - go get github.com/mattn/goveralls
 script:
-  - go build -a -o gomotics
-  - ls -lrt
   - $HOME/gopath/bin/goveralls -v -service=travis-ci
 after_success:
-  - test -n "$TRAVIS_TAG" && curl -sL https://git.io/goreleaser | bash  
+  - test -n "$TRAVIS_TAG" && curl -sL https://git.io/goreleaser | bash 
+  - go build -a -o gomotics 
   - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
   - export REPO=$DOCKER_USER/gomotics
   - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_TAG ; fi`
