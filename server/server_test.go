@@ -81,7 +81,7 @@ func Test_getNhcItems(t *testing.T) {
 	}
 }
 
-func Test_nhcCmd(t *testing.T) {
+/* func Test_nhcCmd(t *testing.T) {
 	expected := "Success"
 	url := baseUrl + "/api/v1/nhc/action?id=1&value=100"
 	hCli := http.Client{
@@ -103,6 +103,6 @@ func Test_nhcCmd(t *testing.T) {
 	//defer rsp.Body.Close()
 	if string(got) != expected {
 		t.Errorf("Test_nhcCmd failed, expecting %v, got %v", expected, string(got))
-	}
+	} */
 
 }
