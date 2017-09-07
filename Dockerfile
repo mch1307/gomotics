@@ -1,4 +1,6 @@
 FROM scratch
-COPY dist/gomotics /gomotics
+RUN mkdir -p /app
+WORKDIR /app
+ADD "./dist/gomotics" "/app/"
 EXPOSE 8081
-ENTRYPOINT ["/gomotics"]
+ENTRYPOINT ["/app/gomotics"]
