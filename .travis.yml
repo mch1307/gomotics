@@ -17,8 +17,9 @@ script:
 after_success:
   - test -n "$TRAVIS_TAG" && curl -sL https://git.io/goreleaser | bash 
   - mkdir -p dist
-  - go build -a -o ./dist/gomotics
+  - CGO_ENABLED="0" GOARCH="amd64" GOOS="linux" go build -a -o ./dist/gomotics
   - ls -ltr ./dist
+  - ls -ltr ./pkg
   - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
   - export REPO=$DOCKER_USER/gomotics
   - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_TAG ; fi`
