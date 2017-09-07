@@ -9,6 +9,8 @@ go:
 services:
   - docker
 before_install:
+  - export COVERALLS_PARALLEL=false		
+  - export GOMAXPROCS=1
   - go get github.com/mattn/goveralls
 script:
   - $HOME/gopath/bin/goveralls -v -service=travis-ci
