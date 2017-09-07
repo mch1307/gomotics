@@ -4,11 +4,9 @@ package server_test
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 
 	"github.com/mch1307/gomotics/nhc"
 	. "github.com/mch1307/gomotics/server"
@@ -103,6 +101,6 @@ func Test_getNhcItems(t *testing.T) {
 	//defer rsp.Body.Close()
 	if string(got) != expected {
 		t.Errorf("Test_nhcCmd failed, expecting %v, got %v", expected, string(got))
-	} */
+	}
 
-}
+}*/
