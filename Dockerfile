@@ -8,7 +8,7 @@ ENV SERVICE_NAME=gomotics \
 
 # Download and install gomotics
 RUN mkdir -p ${SERVICE_HOME}/etc ${SERVICE_HOME}/log 
-ADD "./pkg/linux_amd64/gomotics" "/bin/gomotics"
+ADD "./dist/gomotics" "/bin/gomotics"
 EXPOSE 8081
 WORKDIR $SERVICE_HOME/log
 ENTRYPOINT ["/bin/gomotics"]
