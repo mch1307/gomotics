@@ -3,9 +3,10 @@ package nhc
 import (
 	"encoding/hex"
 	"fmt"
-	"log"
 	"net"
 	"time"
+
+	"github.com/mch1307/gomotics/log"
 )
 
 // Discover discover NHC controller by sending UDP pkg on port 10000
@@ -30,7 +31,7 @@ func Discover() net.IP {
 		for {
 			_, targetAddr, err = conn.ReadFromUDP(b)
 			if err != nil {
-				log.Printf("Error: UDP read error: %v", err)
+				log.Warnf("Error: UDP read error: %v", err)
 				continue
 			}
 			// test "nhc" connection to replying IP to make sure targetAddr is a NHC controller
@@ -40,12 +41,15 @@ func Discover() net.IP {
 				//defer nhConn.Close()
 				if err == nil {
 					nhcConnectString = connectString.IP
+					log.Debug("return IP: ", string(nhcConnectString))
+					return
 				}
 			}
+			//			return
 		}
 	}()
 
 	time.Sleep(time.Second * 3)
-	//defer conn.Close()
+	conn.Close()
 	return nhcConnectString
 }

@@ -1,5 +1,6 @@
 // Package testutil pkg: set of utilities for facilitating tests
 // Only used for unit/integration tests
+//TODO: stub the UDP reply from NHC on port 10000
 package testutil
 
 import (
