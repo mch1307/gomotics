@@ -44,7 +44,7 @@ var Conf GlobalConfig
 func Initialize(cfg string) {
 
 	if _, err := os.Stat(cfg); err != nil {
-		fmt.Println("Invalid config file/path: ", err)
+		//fmt.Println("Invalid config file/path: ", err)
 		wrkDir, _ := os.Getwd()
 		Conf.ServerConfig.LogPath = wrkDir
 	} else {

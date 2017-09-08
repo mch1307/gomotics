@@ -23,7 +23,6 @@ func ConnectNhc(cfg *config.NhcConf) (conn *net.TCPConn, err error) {
 	if err != nil {
 		log.Fatal("error connecting to nhc: ", err)
 	}
-	//log.Info("Connected to nhc")
 	return conn, err
 }
 
@@ -32,7 +31,6 @@ func SendCommand(cmd string) error {
 	conn, _ := ConnectNhc(&config.Conf.NhcConfig)
 	// no error handling as connect will exit in case of issue
 	log.Debug("received command: ", cmd)
-	fmt.Println("received command: ", cmd)
 	fmt.Fprintf(conn, cmd+"\n")
 	return nil
 }
