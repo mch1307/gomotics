@@ -12,6 +12,7 @@ var (
 	nhcActions   []types.Action
 	nhcLocations []types.Location
 	nhcEvent     []types.Event
+	nhcInfo      types.NHCSystemInfo
 )
 
 // Route parse and route incoming message the right handler
@@ -45,5 +46,12 @@ func Route(msg *types.Message) {
 			db.ProcessEvent(rec)
 			//db.SaveItem(nhcEvent[idx])
 		}
+	} else if msg.Cmd == "systeminfo" {
+		/* 		if err := json.Unmarshal(msg.Data, &nhcEvent); err != nil {
+			log.Errorf("unable to parse message %v, err: %v", msg.Data, err)
+		} */
+		msg.Cmd = "dropme"
+		_ = json.Unmarshal(msg.Data, &nhcInfo)
+		db.SaveNhcSysInfo(nhcInfo)
 	}
 }

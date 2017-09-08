@@ -41,3 +41,17 @@ type Item struct {
 	Location string `json:"location"`
 	State    int    `json:"state"`
 }
+
+// NHCSystemInfo hold the NHC system information
+type NHCSystemInfo struct {
+	Swversion       string `json:"swversion"`
+	API             string `json:"api"`
+	Time            string `json:"time"`
+	Language        string `json:"language"`
+	Currency        string `json:"currency"`
+	Units           int    `json:"units"`
+	DST             int    `json:"DST"`
+	TZ              int    `json:"TZ"`
+	Lastenergyerase string `json:"lastenergyerase"`
+	Lastconfig      string `json:"lastconfig"`
+}

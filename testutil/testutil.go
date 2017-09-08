@@ -75,7 +75,7 @@ func PopFakeNhc() {
 	}
 }
 
-func isTCPPortAvailable(port int) bool {
+func IsTCPPortAvailable(port int) bool {
 	if port < 1024 || port > 65500 {
 		return false
 	}
@@ -91,7 +91,7 @@ func isTCPPortAvailable(port int) bool {
 func InitStubNHC() {
 
 	//_, err := net.Dial("tcp", "127.0.0.1:8081")
-	if isTCPPortAvailable(8081) && isTCPPortAvailable(8000) {
+	if IsTCPPortAvailable(8081) && IsTCPPortAvailable(8000) {
 		fmt.Println("starting InitStubNHC")
 		config.Conf.NhcConfig.Host = ConnectHost
 		config.Conf.NhcConfig.Port, _ = strconv.Atoi(ConnectPort)

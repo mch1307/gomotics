@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/gorilla/mux"
 	"github.com/mch1307/gomotics/db"
@@ -14,12 +13,13 @@ import (
 
 // NhcCmd endpoints for sending NHC commands
 func NhcCmd(w http.ResponseWriter, r *http.Request) {
-	vars := r.URL.Query()
-	id, err := strconv.Atoi(strings.Join(vars["id"], ""))
+	//vars := r.URL.Query()
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
 		fmt.Println("invalid request: id should be numeric")
 	}
-	val, err := strconv.Atoi(strings.Join(vars["value"], ""))
+	val, err := strconv.Atoi(vars["value"])
 	if err != nil {
 		fmt.Println("invalid request: value should be numeric")
 	}
@@ -27,8 +27,23 @@ func NhcCmd(w http.ResponseWriter, r *http.Request) {
 	myCmd.Cmd = "executeactions"
 	myCmd.ID = id
 	myCmd.Value = val
-	SendCommand(myCmd.Stringify())
-	w.Write([]byte("Success"))
+
+	if err := SendCommand(myCmd.Stringify()); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintln(w, err)
+	} else {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("Success"))
+	}
+}
+
+// GetNhcInfo handler for /api/v1/nhc/
+func GetNhcInfo(w http.ResponseWriter, r *http.Request) {
+	tmp := db.GetNhcSysInfo()
+	resp, _ := json.Marshal(tmp)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(resp)
 }
 
 // GetNhcItems handler for /api/v1/nhc/
@@ -55,11 +70,10 @@ func GetNhcItem(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if !found {
-		//fmt.Println("not found")
-		//http.Error(w, http.StatusNoContent, "no item matching given id found")
 		w.WriteHeader(http.StatusNoContent)
 		fmt.Fprint(w, string("no item matching given id found"))
 	} else {
+		w.WriteHeader(http.StatusOK)
 		rsp, _ := json.Marshal(resp)
 		w.Write(rsp)
 	}

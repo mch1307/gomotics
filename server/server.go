@@ -30,7 +30,7 @@ type Server struct {
 
 func init() {
 	//log.Init()
-	log.Info("Starting gomotics")
+	fmt.Println("Starting gomotics")
 }
 
 // Initialize initialize the server
@@ -48,8 +48,10 @@ func (s *Server) Initialize() {
 func (s *Server) intializeRoutes() {
 	s.Router.HandleFunc("/health", Health).Methods("GET")
 	s.Router.HandleFunc("/api/v1/nhc/", nhc.GetNhcItems).Methods("GET")
-	s.Router.HandleFunc("/api/v1/nhc/{id}", nhc.GetNhcItem).Methods("GET")
-	s.Router.HandleFunc("/api/v1/nhc/action", nhc.NhcCmd).Methods("PUT")
+	s.Router.HandleFunc("/api/v1/nhc/{id:[0-9]+}", nhc.GetNhcItem).Methods("GET")
+	s.Router.HandleFunc("/api/v1/nhc/{id:[0-9]+}/{value:[0-9]+}", nhc.NhcCmd).Methods("POST")
+	//s.Router.HandleFunc("/api/v1/nhc/action", nhc.NhcCmd).Methods("PUT")
+	s.Router.HandleFunc("/api/v1/nhc/info", nhc.GetNhcInfo).Methods("GET")
 	s.Router.HandleFunc("/events", ws.ServeWebSocket).Methods("GET")
 
 	s.Router.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {

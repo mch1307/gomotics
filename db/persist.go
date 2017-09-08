@@ -12,6 +12,7 @@ var (
 	actionsColl   []types.Action
 	locationsColl []types.Location
 	items         []types.Item
+	nhcInfo       types.NHCSystemInfo
 )
 
 // BuildItems builds the collection of NHC items
@@ -49,7 +50,6 @@ func SaveAction(act types.Action) {
 		log.Debugf("Nhc ID %v not found -> inserted", act.ID)
 		actionsColl = append(actionsColl, act)
 	}
-
 }
 
 // GetAction gets nhc action from collection
@@ -137,7 +137,19 @@ func ProcessEvent(evt types.Event) {
 	log.Debug("Nhc event processed for NHC action id:", evt.ID)
 }
 
+// Dump save collections to log file (debug)
 func Dump() {
 	log.Debug("NHC actions: ", actionsColl)
 	log.Debug("NHC actions: ", locationsColl)
+}
+
+// SaveNhcSysInfo saves the NHC system information in mem
+func SaveNhcSysInfo(nhcSysInfo types.NHCSystemInfo) {
+	nhcInfo = nhcSysInfo
+	log.Debug(nhcInfo)
+}
+
+// GetNhcSysInfo returns the NHC system information
+func GetNhcSysInfo() (nhcSysInfo types.NHCSystemInfo) {
+	return nhcInfo
 }

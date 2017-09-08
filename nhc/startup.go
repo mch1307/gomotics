@@ -11,6 +11,8 @@ import (
 )
 
 const (
+	// SystemInfo holds NHC startevents
+	SystemInfo = "{\"cmd\":\"systeminfo\"}"
 	// RegisterCMD holds NHC startevents
 	RegisterCMD = "{\"cmd\":\"startevents\"}"
 	// ListActions holds NHC listactions
@@ -44,6 +46,15 @@ func Init(cfg *config.NhcConf) {
 		log.Fatalf("Unable to connect to NHC host: %v. Error: %v", cfg.Host, err)
 	}
 	reader := json.NewDecoder(conn)
+	fmt.Println("Connected to NHC unit: ", cfg.Host)
+	log.Info("Connected to NHC unit: ", cfg.Host)
+
+	// sends systeminfo command to NHC
+	fmt.Fprintf(conn, SystemInfo+"\n")
+	if err := reader.Decode(&nhcMessage); err != nil {
+		log.Fatalf("Unable to parse NHC SystemInfo message: %v", err)
+	}
+	Route(&nhcMessage)
 
 	// sends listlocations command to NHC
 	fmt.Fprintf(conn, ListLocations+"\n")
