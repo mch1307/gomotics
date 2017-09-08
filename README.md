@@ -29,7 +29,10 @@ A docker image is automatically build with Travis-CI. It is available on [Docker
 
 ### Binaries
 
-Download your platform binary from the release page, unzip archiveto extract the executable. It will run with default config if you do not provide a configuration file. If you need specific parameters, provide a toml config file as follows:
+Download your platform binary from the release page, extract the executable from the archive. 
+
+## Running
+gomotics will run with default config if you do not provide a configuration file. If you need specific parameters, provide a toml config file as follows:
 
 ``` 
 [server]
