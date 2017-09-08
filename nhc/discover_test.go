@@ -5,9 +5,11 @@ import (
 	"net"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/mch1307/gomotics/log"
 	. "github.com/mch1307/gomotics/nhc"
+	"github.com/mch1307/gomotics/testutil"
 )
 
 func stubNHCTCP() {
@@ -62,6 +64,7 @@ func TestDiscover(t *testing.T) {
 		{"no nhc on LAN", nil},
 		{"stub nhc", getOutboundIP()},
 	}
+	portCheckIteration := 0
 	for _, tt := range tests {
 		fmt.Println("starting test ", tt.name)
 		if tt.want != nil {
@@ -69,8 +72,21 @@ func TestDiscover(t *testing.T) {
 			go stubNHCTCP()
 		}
 		t.Run(tt.name, func(t *testing.T) {
-			if got := Discover(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Discover() = %v, want %v", got, tt.want)
+		GotoTestPort:
+			if testutil.IsTCPPortAvailable(18043) {
+				if got := Discover(); !reflect.DeepEqual(got, tt.want) {
+					t.Errorf("Discover() = %v, want %v", got, tt.want)
+				}
+			} else {
+				portCheckIteration++
+				if portCheckIteration < 21 {
+					fmt.Printf("UDP 18043 busy, %v retry", portCheckIteration)
+					time.Sleep(time.Millisecond * 500)
+					goto GotoTestPort
+				} else {
+					t.Error("Discover failed to get UDP port 18043, test failed")
+				}
+
 			}
 		})
 	}
