@@ -29,6 +29,7 @@ func Discover() net.IP {
 	// goroutine for reading broadcast result
 	go func() {
 		for {
+			defer conn.Close()
 			_, targetAddr, err = conn.ReadFromUDP(b)
 			if err != nil {
 				log.Warnf("Error: UDP read error: %v", err)
@@ -48,7 +49,6 @@ func Discover() net.IP {
 			//			return
 		}
 	}()
-
 	time.Sleep(time.Second * 3)
 	defer conn.Close()
 	return nhcConnectString
