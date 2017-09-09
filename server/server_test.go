@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
-	"github.com/mch1307/gomotics/db"
 	"github.com/mch1307/gomotics/log"
 	. "github.com/mch1307/gomotics/server"
 	"github.com/mch1307/gomotics/testutil"
@@ -29,7 +28,7 @@ func init() {
 	fmt.Println("starting server test")
 	baseUrl = "http://" + testutil.ConnectHost + ":8081"
 	testutil.InitStubNHC()
-	time.Sleep(time.Second * 1)
+	//time.Sleep(time.Second * 1)
 }
 
 func TestHealth(t *testing.T) {
@@ -172,7 +171,7 @@ func Test_tWS(t *testing.T) {
 	}
 	//fmt.Println("# tests: ", len(tests))
 	var msg types.Item
-	time.Sleep(time.Second * 2)
+	//time.Sleep(time.Second * 2)
 	if wsConn, ok, err = wsDial(url); !ok {
 		if retry < 11 {
 			retry++
@@ -207,7 +206,7 @@ func Test_tWS(t *testing.T) {
 		}
 	}()
 
-	time.Sleep(time.Second * 3)
+	time.Sleep(time.Second * 1)
 	for _, tt := range tests {
 		fmt.Println("start test ", tt.name)
 		//ws.WriteMessage(websocket.PingMessage, nil)
@@ -216,10 +215,18 @@ func Test_tWS(t *testing.T) {
 		   		cmd.Value = tt.exState */
 		//fmt.Println(cmd)
 		time.Sleep(time.Millisecond * 500)
+		var evts []types.Event
 		var evt types.Event
 		evt.ID = tt.id
 		evt.Value = tt.exState
-		db.ProcessEvent(evt)
+		evts = append(evts, evt)
+		var nhcMessage types.Message
+		nhcMessage.Event = "listactions"
+		nhcMessage.Data, _ = json.Marshal(&evts)
+		//Value = tt.exState
+		//fmt.Println("send to router: ", &nhcMessage)
+		Route(&nhcMessage)
+		//db.ProcessEvent(evt)
 		time.Sleep(time.Millisecond * 500)
 
 		//fmt.Println("msg ", msg.ID)
@@ -228,7 +235,7 @@ func Test_tWS(t *testing.T) {
 		}
 		ctl++
 	}
-	defer wsConn.Close()
+	//defer wsConn.Close()
 	//fmt.Println("tests ok: ", ctl)
 }
 
