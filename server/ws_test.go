@@ -14,8 +14,6 @@ import (
 	"github.com/mch1307/gomotics/types"
 )
 
-var baseUrl string
-
 func init() {
 	fmt.Println("starting ws test")
 	baseUrl = "http://" + testutil.ConnectHost + ":8081"
