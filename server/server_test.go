@@ -4,9 +4,11 @@ package server_test
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/mch1307/gomotics/nhc"
 	. "github.com/mch1307/gomotics/server"
@@ -22,6 +24,7 @@ func init() {
 	fmt.Println("starting server test")
 	baseUrl = "http://" + testutil.ConnectHost + ":8081"
 	testutil.InitStubNHC()
+	time.Sleep(time.Second * 1)
 }
 
 func TestHealth(t *testing.T) {
@@ -79,13 +82,13 @@ func Test_getNhcItems(t *testing.T) {
 	}
 }
 
-/* func Test_nhcCmd(t *testing.T) {
+func Test_nhcCmd(t *testing.T) {
 	expected := "Success"
-	url := baseUrl + "/api/v1/nhc/action?id=1&value=100"
+	url := baseUrl + "/api/v1/nhc/1/100"
 	hCli := http.Client{
 		Timeout: time.Second * 2,
 	}
-	req, err := http.NewRequest(http.MethodPut, url, nil)
+	req, err := http.NewRequest(http.MethodPost, url, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -103,4 +106,32 @@ func Test_getNhcItems(t *testing.T) {
 		t.Errorf("Test_nhcCmd failed, expecting %v, got %v", expected, string(got))
 	}
 
-}*/
+}
+
+func TestGetNhcInfo(t *testing.T) {
+	expected := "1.10.0.34209"
+	url := baseUrl + "/api/v1/nhc/info"
+	hCli := http.Client{
+		Timeout: time.Second * 2,
+	}
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	//	req.Header.Set("User-Agent", "Test_nhcCmd")
+	rsp, getErr := hCli.Do(req)
+	if getErr != nil {
+		fmt.Println(err)
+	}
+	got, readErr := ioutil.ReadAll(rsp.Body)
+	if readErr != nil {
+		fmt.Println("Read err: ", readErr)
+	}
+	var res types.NHCSystemInfo
+	json.Unmarshal(got, &res)
+	//defer rsp.Body.Close()
+	if res.Swversion != expected {
+		t.Errorf("TestGetNhcInfo failed, expecting %v, got %v", expected, res.Swversion)
+	}
+
+}
