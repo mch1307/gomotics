@@ -50,6 +50,6 @@ func Discover() net.IP {
 	}()
 
 	time.Sleep(time.Second * 3)
-	conn.Close()
+	defer conn.Close()
 	return nhcConnectString
 }
