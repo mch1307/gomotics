@@ -9,6 +9,7 @@ import (
 	. "github.com/mch1307/gomotics/db"
 	"github.com/mch1307/gomotics/nhc"
 	"github.com/mch1307/gomotics/testutil"
+	"github.com/mch1307/gomotics/types"
 )
 
 func init() {
@@ -127,4 +128,21 @@ func TestGetItem(t *testing.T) {
 	   			}
 	   		}
 	   	} */
+}
+
+func TestSaveNhcSysInfo(t *testing.T) {
+	type args struct {
+		nhcSysInfo types.NHCSystemInfo
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+	// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			SaveNhcSysInfo(tt.args.nhcSysInfo)
+		})
+	}
 }

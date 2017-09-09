@@ -28,6 +28,8 @@ const (
 var (
 	actions = `{"cmd":"listactions","data":[{"id":0,"name":"light","type":1,"location":1,"value1":0},{"id":1,"name":"power switch","type":1,"location":2,"value1":0},{"id":3,"name":"light","type":1,"location":1,"value1":0}]}
 	`
+	systemInfo = `{"cmd":"systeminfo","data":{"swversion":"1.10.0.34209","api":"1.19","time":"20001218150021","language":"FR","currency":"EUR","units":0,"DST":0,"TZ":3600,"lastenergyerase":"","lastconfig":"20160904113346"}}
+	`
 	locations = `{"cmd":"listlocations","data":[{"id":0,"name":""},{"id":1,"name":"Living Room"},{"id":2,"name":"Kitchen"}]}
 	`
 	actionEvent = `{"event":"listactions","data":[{"id":1,"value1":100}]}
@@ -90,7 +92,6 @@ func IsTCPPortAvailable(port int) bool {
 // InitStubNHC initialize the NHC Stub and populates dummy data in mem 4 tests
 func InitStubNHC() {
 
-	//_, err := net.Dial("tcp", "127.0.0.1:8081")
 	if IsTCPPortAvailable(8081) && IsTCPPortAvailable(8000) {
 		fmt.Println("starting InitStubNHC")
 		config.Conf.NhcConfig.Host = ConnectHost
@@ -113,7 +114,7 @@ func InitStubNHC() {
 		if retries > 120 {
 			return
 		}
-		fmt.Println("waiting for port to be available for the next test. Retries: ", retries)
+		fmt.Println("NHC stub waiting for port to be available for the next test. Retries: ", retries)
 		time.Sleep(time.Millisecond * 1000)
 		InitStubNHC()
 	}
@@ -181,6 +182,10 @@ func (session *Session) Handle() {
 						cli.connection.Write([]byte(actionEvent))
 					}
 				}
+			} else if nhcMessage.Cmd == "systeminfo" {
+				//fmt.Println("Location: ", nhcMessage.Cmd, nhcMessage.Event, session.sType)
+				session.connection.Write([]byte(systemInfo))
+				nhcMessage.Cmd = "dropme"
 			}
 		}
 	}

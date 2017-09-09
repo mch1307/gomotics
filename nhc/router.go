@@ -47,9 +47,6 @@ func Route(msg *types.Message) {
 			//db.SaveItem(nhcEvent[idx])
 		}
 	} else if msg.Cmd == "systeminfo" {
-		/* 		if err := json.Unmarshal(msg.Data, &nhcEvent); err != nil {
-			log.Errorf("unable to parse message %v, err: %v", msg.Data, err)
-		} */
 		msg.Cmd = "dropme"
 		_ = json.Unmarshal(msg.Data, &nhcInfo)
 		db.SaveNhcSysInfo(nhcInfo)
