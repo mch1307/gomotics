@@ -6,7 +6,6 @@ import (
 	"github.com/mch1307/gomotics/log"
 
 	"github.com/mch1307/gomotics/config"
-	"github.com/mch1307/gomotics/nhc"
 	"github.com/mch1307/gomotics/server"
 )
 
@@ -30,5 +29,5 @@ func Sub(conf string) {
 	s := server.Server{}
 	s.Initialize()
 	s.Run()
-	nhc.Init(&config.Conf.NhcConfig)
+	server.NhcInit(&config.Conf.NhcConfig)
 }

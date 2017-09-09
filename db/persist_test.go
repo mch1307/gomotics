@@ -6,8 +6,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/mch1307/gomotics/server"
+
 	. "github.com/mch1307/gomotics/db"
-	"github.com/mch1307/gomotics/nhc"
+	//"github.com/mch1307/gomotics/nhc"
 	"github.com/mch1307/gomotics/testutil"
 	"github.com/mch1307/gomotics/types"
 )
@@ -63,7 +65,7 @@ func TestGetItems(t *testing.T) {
 		{"fakeSwitch", 1, 100},
 		{"fakeSwitch", 3, 0},
 	}
-	nhc.SendCommand(testutil.MyCmd.Stringify())
+	server.SendCommand(testutil.MyCmd.Stringify())
 	time.Sleep(300 * time.Millisecond)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -106,7 +108,7 @@ func TestGetItem(t *testing.T) {
 		{"fakeSwitch", {1, "power switch"}},
 	} */
 
-	nhc.SendCommand(testutil.MyCmd.Stringify())
+	server.SendCommand(testutil.MyCmd.Stringify())
 	time.Sleep(300 * time.Millisecond)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

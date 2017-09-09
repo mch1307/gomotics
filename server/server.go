@@ -7,12 +7,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/gorilla/mux"
 	"github.com/mch1307/gomotics/config"
 	"github.com/mch1307/gomotics/log"
-	"github.com/mch1307/gomotics/nhc"
-	"github.com/mch1307/gomotics/ws"
-
-	"github.com/gorilla/mux"
 )
 
 // HealthMsg static alive json for health endpoint
@@ -42,17 +39,17 @@ func (s *Server) Initialize() {
 	s.Router = mux.NewRouter().StrictSlash(true)
 	s.intializeRoutes()
 	// Initialize NHC in memory db
-	nhc.Init(&config.Conf.NhcConfig)
+	NhcInit(&config.Conf.NhcConfig)
 }
 
 func (s *Server) intializeRoutes() {
 	s.Router.HandleFunc("/health", Health).Methods("GET")
-	s.Router.HandleFunc("/api/v1/nhc/", nhc.GetNhcItems).Methods("GET")
-	s.Router.HandleFunc("/api/v1/nhc/{id:[0-9]+}", nhc.GetNhcItem).Methods("GET")
-	s.Router.HandleFunc("/api/v1/nhc/{id:[0-9]+}/{value:[0-9]+}", nhc.NhcCmd).Methods("POST")
+	s.Router.HandleFunc("/api/v1/nhc/", GetNhcItems).Methods("GET")
+	s.Router.HandleFunc("/api/v1/nhc/{id:[0-9]+}", GetNhcItem).Methods("GET")
+	s.Router.HandleFunc("/api/v1/nhc/{id:[0-9]+}/{value:[0-9]+}", NhcCmd).Methods("POST")
 	//s.Router.HandleFunc("/api/v1/nhc/action", nhc.NhcCmd).Methods("PUT")
-	s.Router.HandleFunc("/api/v1/nhc/info", nhc.GetNhcInfo).Methods("GET")
-	s.Router.HandleFunc("/events", ws.ServeWebSocket).Methods("GET")
+	s.Router.HandleFunc("/api/v1/nhc/info", GetNhcInfo).Methods("GET")
+	s.Router.HandleFunc("/events", ServeWebSocket).Methods("GET")
 
 	s.Router.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
 		t, err := route.GetPathTemplate()
@@ -77,7 +74,7 @@ func (s *Server) intializeRoutes() {
 
 // Run starts the server process
 func (s *Server) Run() {
-	go nhc.Listener()
+	go NhcListener()
 	log.Fatal(http.ListenAndServe(s.ListenPort, s.Router))
 }
 

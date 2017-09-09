@@ -1,4 +1,4 @@
-package ws_test
+package server_test
 
 import (
 	"bytes"

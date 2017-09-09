@@ -1,6 +1,7 @@
-package ws
+package server
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -22,6 +23,8 @@ const (
 var (
 	newline = []byte{'\n'}
 	space   = []byte{' '}
+	// WSPool instance to hold ClientPool
+	WSPool *ClientPool
 )
 
 var upgrader = websocket.Upgrader{
@@ -31,6 +34,11 @@ var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
 		return true
 	},
+}
+
+func init() {
+	WSPool = newClientPool()
+	go WSPool.Run()
 }
 
 // WSClient handles the ws client conn.
@@ -125,6 +133,56 @@ func (c *WSClient) writePump() {
 			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if err := c.conn.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
 				return
+			}
+		}
+	}
+}
+
+// ClientPool maintains the set of active clients and broadcasts messages to the
+// clients. Use the Broadcast channel to push msg to all clients
+type ClientPool struct {
+	// Clients: Registered clients.
+	clients map[*WSClient]bool
+	// Broadcast Inbound messages from the clients.
+	Broadcast chan []byte
+	// Register requests from the clients.
+	register chan *WSClient
+	// Unregister requests from clients.
+	Unregister chan *WSClient
+}
+
+// newClientPool instantiates the ClientPool
+func newClientPool() *ClientPool {
+	log.Debug("new ws pool created")
+	return &ClientPool{
+		Broadcast:  make(chan []byte),
+		register:   make(chan *WSClient),
+		Unregister: make(chan *WSClient),
+		clients:    make(map[*WSClient]bool),
+	}
+}
+
+// Run activates the ClientPool so that we can manage
+// client connections
+func (cp *ClientPool) Run() {
+	fmt.Println("WSPool run starting")
+	for {
+		select {
+		case client := <-cp.register:
+			cp.clients[client] = true
+		case client := <-cp.Unregister:
+			if _, ok := cp.clients[client]; ok {
+				delete(cp.clients, client)
+				close(client.send)
+			}
+		case message := <-cp.Broadcast:
+			for client := range cp.clients {
+				select {
+				case client.send <- message:
+				default:
+					close(client.send)
+					delete(cp.clients, client)
+				}
 			}
 		}
 	}

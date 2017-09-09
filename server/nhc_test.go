@@ -1,4 +1,4 @@
-package nhc_test
+package server_test
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/mch1307/gomotics/log"
-	. "github.com/mch1307/gomotics/nhc"
+	. "github.com/mch1307/gomotics/server"
 	"github.com/mch1307/gomotics/testutil"
 )
 

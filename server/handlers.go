@@ -1,4 +1,4 @@
-package nhc
+package server
 
 import (
 	"encoding/json"

@@ -14,7 +14,7 @@ import (
 
 	"github.com/mch1307/gomotics/config"
 	"github.com/mch1307/gomotics/db"
-	"github.com/mch1307/gomotics/nhc"
+	//"github.com/mch1307/gomotics/nhc"
 	"github.com/mch1307/gomotics/server"
 	"github.com/mch1307/gomotics/types"
 )
@@ -44,7 +44,7 @@ var (
 	testConf = config.NhcConf{Host: "localhost", Port: 8000}
 	command  = types.Event{ID: 1, Value: 100}
 	// MyCmd exported nhc.SimpleCmd
-	MyCmd                                        = nhc.SimpleCmd{Cmd: "executeactions", ID: 1, Value: 100}
+	MyCmd                                        = server.SimpleCmd{Cmd: "executeactions", ID: 1, Value: 100}
 	fakeActionsMsg, fakeLocationsMsg, nhcMessage types.Message
 	popFakeRun, initRun                          bool
 	retries                                      = 0
@@ -69,9 +69,9 @@ func PopFakeNhc() {
 
 	if !popFakeRun {
 		json.Unmarshal([]byte(locations), &fakeLocationsMsg)
-		nhc.Route(&fakeLocationsMsg)
+		server.Route(&fakeLocationsMsg)
 		json.Unmarshal([]byte(actions), &fakeActionsMsg)
-		nhc.Route(&fakeActionsMsg)
+		server.Route(&fakeActionsMsg)
 		db.BuildItems()
 		popFakeRun = true
 	}
@@ -99,7 +99,7 @@ func InitStubNHC() {
 		config.Conf.ServerConfig.ListenPort = 8081
 		config.Conf.ServerConfig.LogLevel = "DEBUG"
 		go MockNHC()
-		go nhc.Listener()
+		go server.NhcListener()
 		time.Sleep(500 * time.Millisecond)
 		//nhc.Init(&testConf)
 		// call twice to test update items in persit.go

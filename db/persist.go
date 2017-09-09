@@ -5,7 +5,6 @@ import (
 
 	"github.com/mch1307/gomotics/log"
 	"github.com/mch1307/gomotics/types"
-	"github.com/mch1307/gomotics/ws"
 )
 
 var (
@@ -115,7 +114,7 @@ func GetLocation(id int) types.Location {
 }
 
 // ProcessEvent saves new state of nhc equipment to relevant collections
-func ProcessEvent(evt types.Event) {
+func ProcessEvent(evt types.Event) []byte {
 	for idx := range actionsColl {
 		if actionsColl[idx].ID == evt.ID {
 			actionsColl[idx].Value1 = evt.Value
@@ -127,14 +126,15 @@ func ProcessEvent(evt types.Event) {
 		}
 	}
 	item, found := GetItem(evt.ID)
-
+	var event []byte
 	if found {
-		event, _ := json.Marshal(item)
-		ws.WSPool.Broadcast <- event
+		event, _ = json.Marshal(item)
+		//server.WSPool.Broadcast <- event
 	} else {
 		log.Debug("no record found: item ", evt.ID)
 	}
 	log.Debug("Nhc event processed for NHC action id:", evt.ID)
+	return event
 }
 
 // Dump save collections to log file (debug)

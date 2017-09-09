@@ -10,7 +10,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mch1307/gomotics/nhc"
 	. "github.com/mch1307/gomotics/server"
 	"github.com/mch1307/gomotics/testutil"
 	"github.com/mch1307/gomotics/types"
@@ -48,7 +47,7 @@ func Test_getNhcItem(t *testing.T) {
 		t.Fatal(err)
 	}
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(nhc.GetNhcItem)
+	handler := http.HandlerFunc(GetNhcItem)
 	handler.ServeHTTP(rr, req)
 	expected := "light"
 	var res types.Item
@@ -64,7 +63,7 @@ func Test_getNhcItems(t *testing.T) {
 		t.Fatal(err)
 	}
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(nhc.GetNhcItems)
+	handler := http.HandlerFunc(GetNhcItems)
 	handler.ServeHTTP(rr, req)
 	var found bool
 	expected := "light"
@@ -118,7 +117,7 @@ func TestGetNhcInfo(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	//	req.Header.Set("User-Agent", "Test_nhcCmd")
+	req.Header.Set("User-Agent", "Test_nhcCmd")
 	rsp, getErr := hCli.Do(req)
 	if getErr != nil {
 		fmt.Println(err)
