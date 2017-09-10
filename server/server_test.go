@@ -27,17 +27,11 @@ var origin = "http://localhost/"
 var url = "ws://localhost:8081/events"
 
 func TestMain(m *testing.M) {
+	fmt.Println("TestMain: starting stub")
 	testutil.InitStubNHC()
 	ret := m.Run()
 	os.Exit(ret)
 }
-
-/* func initStub() {
-	if !testutil.IsStubRunning() {
-		fmt.Println("Stub not running")
-		testutil.InitStubNHC()
-	}
-} */
 
 func init() {
 	fmt.Println("starting server test")
