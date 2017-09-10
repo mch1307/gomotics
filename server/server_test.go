@@ -25,10 +25,7 @@ var origin = "http://localhost/"
 var url = "ws://localhost:8081/events"
 
 func TestMain(m *testing.M) {
-	if !testutil.IsStubRunning() {
-		fmt.Println("Stub not running")
-		testutil.InitStubNHC()
-	}
+	testutil.InitStubNHC()
 	ret := m.Run()
 	os.Exit(ret)
 }
