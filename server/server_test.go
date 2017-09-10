@@ -21,14 +21,13 @@ import (
 )
 
 var baseUrl string
-
-//const healthMsg = `{"alive":true}`
+var origin = "http://localhost/"
+var url = "ws://localhost:8081/events"
 
 func init() {
 	fmt.Println("starting server test")
 	baseUrl = "http://" + testutil.ConnectHost + ":8081"
 	testutil.InitStubNHC()
-	//time.Sleep(time.Second * 1)
 }
 
 func TestHealth(t *testing.T) {
@@ -42,7 +41,6 @@ func TestHealth(t *testing.T) {
 	if rr.Body.String() != HealthMsg {
 		t.Errorf("health test failed: got %v, expect: %v", rr.Body.String(), HealthMsg)
 	}
-
 }
 
 // TODO: add more test cases (test non existing item)
@@ -109,7 +107,6 @@ func Test_nhcCmd(t *testing.T) {
 	if string(got) != expected {
 		t.Errorf("Test_nhcCmd failed, expecting %v, got %v", expected, string(got))
 	}
-
 }
 
 func TestGetNhcInfo(t *testing.T) {
@@ -137,11 +134,7 @@ func TestGetNhcInfo(t *testing.T) {
 	if res.Swversion != expected {
 		t.Errorf("TestGetNhcInfo failed, expecting %v, got %v", expected, res.Swversion)
 	}
-
 }
-
-var origin = "http://localhost/"
-var url = "ws://localhost:8081/events"
 
 func wsDial(url string) (wsConn *websocket.Conn, ok bool, err error) {
 	webS, _, err := websocket.DefaultDialer.Dial(url, nil)
