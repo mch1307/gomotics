@@ -24,13 +24,21 @@ var baseUrl string
 var origin = "http://localhost/"
 var url = "ws://localhost:8081/events"
 
+func initStub() {
+	if !testutil.IsStubRunning() {
+		fmt.Println("Stub not running")
+		testutil.InitStubNHC()
+	}
+}
+
 func init() {
 	fmt.Println("starting server test")
 	baseUrl = "http://" + testutil.ConnectHost + ":8081"
-	testutil.InitStubNHC()
+	initStub()
 }
 
 func TestHealth(t *testing.T) {
+	initStub()
 	req, err := http.NewRequest("GET", baseUrl+"/health", nil)
 	if err != nil {
 		t.Fatal(err)
@@ -45,6 +53,7 @@ func TestHealth(t *testing.T) {
 
 // TODO: add more test cases (test non existing item)
 func Test_getNhcItem(t *testing.T) {
+	initStub()
 	req, err := http.NewRequest("GET", baseUrl+"/api/v1/nhc/99", nil)
 	if err != nil {
 		t.Fatal(err)
@@ -61,6 +70,7 @@ func Test_getNhcItem(t *testing.T) {
 }
 
 func Test_getNhcItems(t *testing.T) {
+	initStub()
 	req, err := http.NewRequest("GET", baseUrl+"/api/v1/nhc", nil)
 	if err != nil {
 		t.Fatal(err)
@@ -84,7 +94,8 @@ func Test_getNhcItems(t *testing.T) {
 	}
 }
 
-/* func Test_nhcCmd(t *testing.T) {
+func Test_nhcCmd(t *testing.T) {
+	initStub()
 	expected := "Success"
 	url := baseUrl + "/api/v1/nhc/1/100"
 	hCli := http.Client{
@@ -107,9 +118,10 @@ func Test_getNhcItems(t *testing.T) {
 	if string(got) != expected {
 		t.Errorf("Test_nhcCmd failed, expecting %v, got %v", expected, string(got))
 	}
-} */
+}
 
 func TestGetNhcInfo(t *testing.T) {
+	initStub()
 	expected := "1.10.0.34209"
 	url := baseUrl + "/api/v1/nhc/info"
 	hCli := http.Client{

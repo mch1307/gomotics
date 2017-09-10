@@ -89,6 +89,17 @@ func IsTCPPortAvailable(port int) bool {
 	return true
 }
 
+// IsStubRunning check if stub is up
+func IsStubRunning() bool {
+	running := false
+	if IsTCPPortAvailable(8081) && IsTCPPortAvailable(8000) {
+		running = false
+	} else {
+		running = true
+	}
+	return running
+}
+
 // InitStubNHC initialize the NHC Stub and populates dummy data in mem 4 tests
 func InitStubNHC() {
 
@@ -115,7 +126,7 @@ func InitStubNHC() {
 			return
 		}
 		fmt.Println("NHC stub waiting for port to be available for the next test. Retries: ", retries)
-		time.Sleep(time.Millisecond * 1000)
+		time.Sleep(time.Millisecond * 500)
 		InitStubNHC()
 	}
 }
