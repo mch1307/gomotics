@@ -24,6 +24,12 @@ var baseUrl string
 var origin = "http://localhost/"
 var url = "ws://localhost:8081/events"
 
+func TestMain(t *testing.T) {
+	if !testutil.IsStubRunning() {
+		fmt.Println("Stub not running")
+		testutil.InitStubNHC()
+	}
+}
 func initStub() {
 	if !testutil.IsStubRunning() {
 		fmt.Println("Stub not running")
@@ -94,7 +100,7 @@ func Test_getNhcItems(t *testing.T) {
 	}
 }
 
-/* func Test_nhcCmd(t *testing.T) {
+func Test_nhcCmd(t *testing.T) {
 	initStub()
 	expected := "Success"
 	url := baseUrl + "/api/v1/nhc/1/100"
@@ -118,7 +124,7 @@ func Test_getNhcItems(t *testing.T) {
 	if string(got) != expected {
 		t.Errorf("Test_nhcCmd failed, expecting %v, got %v", expected, string(got))
 	}
-} */
+}
 
 func TestGetNhcInfo(t *testing.T) {
 	initStub()
