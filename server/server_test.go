@@ -9,6 +9,7 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
 	"time"
 
@@ -83,7 +84,7 @@ func Test_getNhcItems(t *testing.T) {
 	}
 }
 
-func Test_nhcCmd(t *testing.T) {
+/* func Test_nhcCmd(t *testing.T) {
 	expected := "Success"
 	url := baseUrl + "/api/v1/nhc/1/100"
 	hCli := http.Client{
@@ -106,7 +107,7 @@ func Test_nhcCmd(t *testing.T) {
 	if string(got) != expected {
 		t.Errorf("Test_nhcCmd failed, expecting %v, got %v", expected, string(got))
 	}
-}
+} */
 
 func TestGetNhcInfo(t *testing.T) {
 	expected := "1.10.0.34209"
@@ -274,7 +275,7 @@ func getOutboundIP() net.IP {
 	return localAddr.IP
 }
 
-/* func TestDiscover(t *testing.T) {
+func TestDiscover(t *testing.T) {
 
 	tests := []struct {
 		name string
@@ -309,4 +310,4 @@ func getOutboundIP() net.IP {
 			}
 		})
 	}
-} */
+}
