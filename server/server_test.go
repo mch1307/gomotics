@@ -94,7 +94,7 @@ func Test_getNhcItems(t *testing.T) {
 	}
 }
 
-func Test_nhcCmd(t *testing.T) {
+/* func Test_nhcCmd(t *testing.T) {
 	initStub()
 	expected := "Success"
 	url := baseUrl + "/api/v1/nhc/1/100"
@@ -118,7 +118,7 @@ func Test_nhcCmd(t *testing.T) {
 	if string(got) != expected {
 		t.Errorf("Test_nhcCmd failed, expecting %v, got %v", expected, string(got))
 	}
-}
+} */
 
 func TestGetNhcInfo(t *testing.T) {
 	initStub()
