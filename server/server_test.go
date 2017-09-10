@@ -2,6 +2,7 @@ package server_test
 
 // TODO: review the http testing
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -11,14 +12,16 @@ import (
 	"net/http/httptest"
 	"os"
 	"reflect"
+	"strconv"
 	"testing"
 	"time"
 
 	"github.com/gorilla/websocket"
+	"github.com/mch1307/gomotics/config"
 	"github.com/mch1307/gomotics/db"
 	"github.com/mch1307/gomotics/log"
 	. "github.com/mch1307/gomotics/server"
-	"github.com/mch1307/gomotics/testutil"
+	//"github.com/mch1307/gomotics/testutil"
 	"github.com/mch1307/gomotics/types"
 )
 
@@ -28,15 +31,198 @@ var url = "ws://localhost:8081/events"
 
 func TestMain(m *testing.M) {
 	fmt.Println("TestMain: starting stub")
-	testutil.InitStubNHC()
+	InitStubNHC()
 	ret := m.Run()
 	os.Exit(ret)
 }
 
 func init() {
 	fmt.Println("starting server test")
-	baseUrl = "http://" + testutil.ConnectHost + ":8081"
+	baseUrl = "http://" + ConnectHost + ":8081"
 	//initStub()
+}
+
+const (
+	ConnectHost  = "localhost"
+	ConnectPort  = "8000"
+	connectProto = "tcp"
+)
+
+var (
+	actions = `{"cmd":"listactions","data":[{"id":0,"name":"light","type":1,"location":1,"value1":0},{"id":1,"name":"power switch","type":1,"location":2,"value1":0},{"id":3,"name":"light","type":1,"location":1,"value1":0}]}
+	`
+	systemInfo = `{"cmd":"systeminfo","data":{"swversion":"1.10.0.34209","api":"1.19","time":"20001218150021","language":"FR","currency":"EUR","units":0,"DST":0,"TZ":3600,"lastenergyerase":"","lastconfig":"20160904113346"}}
+	`
+	locations = `{"cmd":"listlocations","data":[{"id":0,"name":""},{"id":1,"name":"Living Room"},{"id":2,"name":"Kitchen"}]}
+	`
+	actionEvent = `{"event":"listactions","data":[{"id":1,"value1":100}]}
+	`
+	invalidMsg = `{"event":"listactions","data":[{"id":1,"value1":100}]
+	`
+	startEvents = `{"cmd":"startevents","data":[{"id":1,"value1":100}]}
+	`
+	invalidNHCMsg = `{"event":"listactions","data":[{"i":1,"val":100}]}
+	`
+	failConf = config.NhcConf{Host: "willFail", Port: 8000}
+	testConf = config.NhcConf{Host: "localhost", Port: 8000}
+	command  = types.Event{ID: 1, Value: 100}
+	// MyCmd exported nhc.SimpleCmd
+	MyCmd                                        = SimpleCmd{Cmd: "executeactions", ID: 1, Value: 100}
+	fakeActionsMsg, fakeLocationsMsg, nhcMessage types.Message
+	popFakeRun, initRun                          bool
+	retries                                      = 0
+)
+
+// Sessions type used for managin session in NHC Stub (listener vs commands)
+type Sessions []*Session
+
+// Clients holds client session list
+var Clients Sessions
+
+// Session type holds the NHC stub client connection
+type Session struct {
+	sType      string
+	connection net.Conn
+	reader     *bufio.Reader
+	writer     *bufio.Writer
+}
+
+// PopFakeNhc populates in mem db with fake data for UT
+func PopFakeNhc() {
+
+	if !popFakeRun {
+		json.Unmarshal([]byte(locations), &fakeLocationsMsg)
+		Route(&fakeLocationsMsg)
+		json.Unmarshal([]byte(actions), &fakeActionsMsg)
+		Route(&fakeActionsMsg)
+		db.BuildItems()
+		popFakeRun = true
+	}
+}
+
+func IsTCPPortAvailable(port int) bool {
+	if port < 1024 || port > 65500 {
+		return false
+	}
+	conn, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", port))
+	if err != nil {
+		return false
+	}
+	conn.Close()
+	return true
+}
+
+// IsStubRunning check if stub is up
+func IsStubRunning() bool {
+	running := false
+	if IsTCPPortAvailable(8081) && IsTCPPortAvailable(8000) {
+		running = false
+	} else {
+		running = true
+	}
+	return running
+}
+
+// InitStubNHC initialize the NHC Stub and populates dummy data in mem 4 tests
+func InitStubNHC() {
+
+	if IsTCPPortAvailable(8081) && IsTCPPortAvailable(8000) {
+		fmt.Println("starting InitStubNHC")
+		config.Conf.NhcConfig.Host = ConnectHost
+		config.Conf.NhcConfig.Port, _ = strconv.Atoi(ConnectPort)
+		config.Conf.ServerConfig.ListenPort = 8081
+		config.Conf.ServerConfig.LogLevel = "DEBUG"
+		go MockNHC()
+		go NhcListener()
+		time.Sleep(500 * time.Millisecond)
+		//nhc.Init(&testConf)
+		// call twice to test update items in persit.go
+		//nhc.Init(&testConf)
+		s := Server{}
+		s.Initialize()
+		go s.Run()
+		//ws.Initialize()
+		initRun = true
+	} else {
+		retries++
+		if retries > 120 {
+			return
+		}
+		fmt.Println("NHC stub waiting for port to be available for the next test. Retries: ", retries)
+		time.Sleep(time.Millisecond * 500)
+		InitStubNHC()
+	}
+}
+
+// MockNHC simulates a NHC controller on localhost:8000
+func MockNHC() {
+	l, err := net.Listen(connectProto, ConnectHost+":"+ConnectPort)
+	if err != nil {
+		os.Exit(1)
+	}
+	// Close the listener when the application closes.
+	defer l.Close()
+	fmt.Println("Listening on " + ConnectHost + ":" + ConnectPort)
+	for {
+		// Listen for an incoming connection.
+		conn, err := l.Accept()
+		if err != nil {
+			os.Exit(1)
+		}
+		// populate the list of Clients
+		client := NewSession(conn)
+		// handle connection in goroutine
+		go client.Handle()
+	}
+}
+
+// NewSession populates the Sessions (list of client connections) on client connect
+func NewSession(conn net.Conn) *Session {
+	reader := bufio.NewReader(conn)
+	writer := bufio.NewWriter(conn)
+	session := &Session{
+		connection: conn,
+		reader:     reader,
+		writer:     writer,
+	}
+	Clients = append(Clients, session)
+	return session
+}
+
+// Handle handles the client connection
+func (session *Session) Handle() {
+	for {
+		//fmt.Println("mock msg: ", nhcMessage.Cmd, nhcMessage.Event, nhcMessage.Data)
+		message, _ := bufio.NewReader(session.connection).ReadBytes('\n')
+		if len(message) > 0 {
+			_ = json.Unmarshal(message, &nhcMessage)
+			if nhcMessage.Cmd == "startevents" {
+				//fmt.Println("Listener session")
+				session.sType = "listener"
+				session.connection.Write([]byte(startEvents))
+				//session.connection.Write([]byte(invalidMsg))
+			} else if nhcMessage.Cmd == "listactions" {
+				//fmt.Println("Actions: ", nhcMessage.Cmd, nhcMessage.Event, session.sType)
+				session.connection.Write([]byte(actions))
+				nhcMessage.Cmd = "dropme"
+			} else if nhcMessage.Cmd == "listlocations" {
+				//fmt.Println("Location: ", nhcMessage.Cmd, nhcMessage.Event, session.sType)
+				session.connection.Write([]byte(locations))
+				nhcMessage.Cmd = "dropme"
+			} else if nhcMessage.Cmd == "executeactions" {
+				//fmt.Println("Event: ", nhcMessage.Cmd, nhcMessage.Event, session.sType)
+				for _, cli := range Clients {
+					if cli.sType == "listener" {
+						cli.connection.Write([]byte(actionEvent))
+					}
+				}
+			} else if nhcMessage.Cmd == "systeminfo" {
+				//fmt.Println("Location: ", nhcMessage.Cmd, nhcMessage.Event, session.sType)
+				session.connection.Write([]byte(systemInfo))
+				nhcMessage.Cmd = "dropme"
+			}
+		}
+	}
 }
 
 func TestHealth(t *testing.T) {
@@ -212,7 +398,7 @@ func Test_tWS(t *testing.T) {
 	for _, tt := range tests {
 		fmt.Println("start test ", tt.name)
 		//ws.WriteMessage(websocket.PingMessage, nil)
-		/* 		cmd := testutil.MyCmd
+		/* 		cmd := MyCmd
 		   		cmd.ID = tt.id
 		   		cmd.Value = tt.exState */
 		//fmt.Println(cmd)
@@ -302,7 +488,7 @@ func TestDiscover(t *testing.T) {
 		}
 		t.Run(tt.name, func(t *testing.T) {
 		GotoTestPort:
-			if testutil.IsTCPPortAvailable(18043) {
+			if IsTCPPortAvailable(18043) {
 				if got := Discover(); !reflect.DeepEqual(got, tt.want) {
 					t.Errorf("Discover() = %v, want %v", got, tt.want)
 				}
@@ -363,7 +549,7 @@ func TestGetItems(t *testing.T) {
 		{"fakeSwitch", 1, 100},
 		{"fakeSwitch", 3, 0},
 	}
-	SendCommand(testutil.MyCmd.Stringify())
+	SendCommand(MyCmd.Stringify())
 	time.Sleep(300 * time.Millisecond)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -406,7 +592,7 @@ func TestGetItem(t *testing.T) {
 		{"fakeSwitch", {1, "power switch"}},
 	} */
 
-	SendCommand(testutil.MyCmd.Stringify())
+	SendCommand(MyCmd.Stringify())
 	time.Sleep(300 * time.Millisecond)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
