@@ -9,7 +9,6 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
-	"reflect"
 	"testing"
 	"time"
 
@@ -97,7 +96,7 @@ func Test_nhcCmd(t *testing.T) {
 	//	req.Header.Set("User-Agent", "Test_nhcCmd")
 	rsp, getErr := hCli.Do(req)
 	if getErr != nil {
-		fmt.Println(err)
+		fmt.Println("Get err ", err)
 	}
 	got, readErr := ioutil.ReadAll(rsp.Body)
 	if readErr != nil {
@@ -275,7 +274,7 @@ func getOutboundIP() net.IP {
 	return localAddr.IP
 }
 
-func TestDiscover(t *testing.T) {
+/* func TestDiscover(t *testing.T) {
 
 	tests := []struct {
 		name string
@@ -310,4 +309,4 @@ func TestDiscover(t *testing.T) {
 			}
 		})
 	}
-}
+} */
