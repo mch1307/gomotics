@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
+	"github.com/mch1307/gomotics/db"
 	"github.com/mch1307/gomotics/log"
 	. "github.com/mch1307/gomotics/server"
 	"github.com/mch1307/gomotics/testutil"
@@ -336,7 +337,7 @@ func TestGetLocation(t *testing.T) {
 	//expect := "Living Room"
 	expect := "Kitchen"
 	t.Run("location", func(t *testing.T) {
-		if got := GetLocation(id); !reflect.DeepEqual(got.Name, expect) {
+		if got := db.GetLocation(id); !reflect.DeepEqual(got.Name, expect) {
 			t.Errorf("getLocation() = %v, expected %v", got.Name, expect)
 		}
 	})
@@ -354,7 +355,7 @@ func TestGetAction(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := GetAction(tt.arg)
+			got := db.GetAction(tt.arg)
 			if !reflect.DeepEqual(got.Name, tt.exName) {
 				t.Errorf("GetAction() name = %v, want %v", got.Name, tt.exName)
 			} else if !reflect.DeepEqual(got.Name, tt.exName) {
@@ -373,13 +374,13 @@ func TestGetItems(t *testing.T) {
 		{"fakeSwitch", 1, 100},
 		{"fakeSwitch", 3, 0},
 	}
-	server.SendCommand(testutil.MyCmd.Stringify())
+	SendCommand(testutil.MyCmd.Stringify())
 	time.Sleep(300 * time.Millisecond)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := GetItems()
+			got := db.GetItems()
 			fmt.Println(len(got))
-			Dump()
+			db.Dump()
 			for _, item := range got {
 				if item.ID == tt.id {
 					fmt.Println("ok got ", item.Name, " ", item.ID)
@@ -416,12 +417,12 @@ func TestGetItem(t *testing.T) {
 		{"fakeSwitch", {1, "power switch"}},
 	} */
 
-	server.SendCommand(testutil.MyCmd.Stringify())
+	SendCommand(testutil.MyCmd.Stringify())
 	time.Sleep(300 * time.Millisecond)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			fmt.Println("starting test ", tt.name)
-			got, ok := GetItem(tt.res.id)
+			got, ok := db.GetItem(tt.res.id)
 			if !ok {
 				t.Errorf("test %v failed for item %v", tt.name, tt.res.name)
 			}
@@ -452,7 +453,7 @@ func TestSaveNhcSysInfo(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			SaveNhcSysInfo(tt.args.nhcSysInfo)
+			db.SaveNhcSysInfo(tt.args.nhcSysInfo)
 		})
 	}
 }
