@@ -52,6 +52,33 @@ func TestHealth(t *testing.T) {
 	}
 }
 
+func TestGetNhcInfo(t *testing.T) {
+	expected := "1.10.0.34209"
+	url := baseUrl + "/api/v1/nhc/info"
+	hCli := http.Client{
+		Timeout: time.Second * 2,
+	}
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	req.Header.Set("User-Agent", "TestGetNhcInfo")
+	rsp, getErr := hCli.Do(req)
+	if getErr != nil {
+		fmt.Println(err)
+	}
+	got, readErr := ioutil.ReadAll(rsp.Body)
+	if readErr != nil {
+		fmt.Println("Read err: ", readErr)
+	}
+	var res types.NHCSystemInfo
+	json.Unmarshal(got, &res)
+	//defer rsp.Body.Close()
+	if res.Swversion != expected {
+		t.Errorf("TestGetNhcInfo failed, expecting %v, got %v", expected, res.Swversion)
+	}
+}
+
 // TODO: add more test cases (test non existing item)
 func Test_getNhcItem(t *testing.T) {
 	req, err := http.NewRequest("GET", baseUrl+"/api/v1/nhc/99", nil)
@@ -117,33 +144,6 @@ func Test_getNhcItems(t *testing.T) {
 		t.Errorf("Test_nhcCmd failed, expecting %v, got %v", expected, string(got))
 	}
 } */
-
-func TestGetNhcInfo(t *testing.T) {
-	expected := "1.10.0.34209"
-	url := baseUrl + "/api/v1/nhc/info"
-	hCli := http.Client{
-		Timeout: time.Second * 2,
-	}
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-	req.Header.Set("User-Agent", "TestGetNhcInfo")
-	rsp, getErr := hCli.Do(req)
-	if getErr != nil {
-		fmt.Println(err)
-	}
-	got, readErr := ioutil.ReadAll(rsp.Body)
-	if readErr != nil {
-		fmt.Println("Read err: ", readErr)
-	}
-	var res types.NHCSystemInfo
-	json.Unmarshal(got, &res)
-	//defer rsp.Body.Close()
-	if res.Swversion != expected {
-		t.Errorf("TestGetNhcInfo failed, expecting %v, got %v", expected, res.Swversion)
-	}
-}
 
 func wsDial(url string) (wsConn *websocket.Conn, ok bool, err error) {
 	webS, _, err := websocket.DefaultDialer.Dial(url, nil)
