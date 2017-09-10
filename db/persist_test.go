@@ -2,6 +2,7 @@ package db_test
 
 import (
 	"fmt"
+	"os"
 	"reflect"
 	"testing"
 	"time"
@@ -14,15 +15,24 @@ import (
 	"github.com/mch1307/gomotics/types"
 )
 
-func init() {
+func TestMain(m *testing.M) {
+	if !testutil.IsStubRunning() {
+		fmt.Println("Stub not running")
+		testutil.InitStubNHC()
+	}
+	ret := m.Run()
+	os.Exit(ret)
+}
+
+/* func init() {
 	// test failures
 	//go Init(&failConf)
 
 	fmt.Println("starting db test")
-	testutil.InitStubNHC()
-	Dump()
+	//testutil.InitStubNHC()
+	//Dump()
 	//SendCommand(myCmd.Stringify())
-}
+} */
 func TestGetLocation(t *testing.T) {
 	id := 2
 	//expect := "Living Room"
