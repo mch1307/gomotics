@@ -6,7 +6,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -238,7 +237,7 @@ func TestHealth(t *testing.T) {
 	}
 }
 
-func TestGetNhcInfo(t *testing.T) {
+/* func TestGetNhcInfo(t *testing.T) {
 	expected := "1.10.0.34209"
 	url := baseUrl + "/api/v1/nhc/info"
 	hCli := http.Client{
@@ -263,7 +262,7 @@ func TestGetNhcInfo(t *testing.T) {
 	if res.Swversion != expected {
 		t.Errorf("TestGetNhcInfo failed, expecting %v, got %v", expected, res.Swversion)
 	}
-}
+} */
 
 // TODO: add more test cases (test non existing item)
 func Test_getNhcItem(t *testing.T) {
