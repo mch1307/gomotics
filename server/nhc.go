@@ -180,7 +180,7 @@ func Discover() net.IP {
 	if err != nil {
 		fmt.Println("err connect: ", err)
 	}
-	defer conn.Close()
+	//defer conn.Close()
 	_, err = conn.WriteToUDP(data, &addr)
 
 	b := make([]byte, 1024)
@@ -204,6 +204,7 @@ func Discover() net.IP {
 					return
 				}
 			}
+			defer conn.Close()
 			//			return
 		}
 	}()
