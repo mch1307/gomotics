@@ -3,9 +3,6 @@ package main
 import (
 	"flag"
 
-	"github.com/mch1307/gomotics/log"
-
-	"github.com/mch1307/gomotics/config"
 	"github.com/mch1307/gomotics/server"
 )
 
@@ -19,10 +16,10 @@ func init() {
 
 func main() {
 	flag.Parse()
-	Sub(conf)
+	server.Start(conf)
 }
 
-// Sub actually starts the servers
+/* // Sub actually starts the servers
 func Sub(conf string) {
 	config.Initialize(conf)
 	log.Init()
@@ -31,3 +28,4 @@ func Sub(conf string) {
 	s.Run()
 	server.NhcInit(&config.Conf.NhcConfig)
 }
+*/

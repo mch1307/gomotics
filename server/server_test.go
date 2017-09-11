@@ -12,7 +12,6 @@ import (
 	"net/http/httptest"
 	"os"
 	"reflect"
-	"strconv"
 	"testing"
 	"time"
 
@@ -128,24 +127,33 @@ func InitStubNHC() {
 
 	if IsTCPPortAvailable(8081) && IsTCPPortAvailable(8000) {
 		fmt.Println("starting InitStubNHC")
-		config.Conf.NhcConfig.Host = ConnectHost
-		config.Conf.NhcConfig.Port, _ = strconv.Atoi(ConnectPort)
-		config.Conf.ServerConfig.ListenPort = 8081
-		config.Conf.ServerConfig.LogLevel = "DEBUG"
 		go MockNHC()
-		go NhcListener()
-		time.Sleep(1000 * time.Millisecond)
+		go stubNHCUDP()
+		go Start("../config/test.toml")
+		//go Sub("../config/test.toml")
+		/* s := Server{}
+		s.Initialize()
+		s.Run() */
+		initRun = true
+		time.Sleep(5000 * time.Millisecond)
+		// Call nhcInit a second time to test updates
+		NhcInit(&config.Conf.NhcConfig)
+
+		/* 		config.Conf.NhcConfig.Host = ConnectHost
+		   		config.Conf.NhcConfig.Port, _ = strconv.Atoi(ConnectPort)
+		   		config.Conf.ServerConfig.ListenPort = 8081
+		   		config.Conf.ServerConfig.LogLevel = "DEBUG"
+		*/
+		//go NhcListener()
+		//time.Sleep(1000 * time.Millisecond)
 		//nhc.Init(&testConf)
 		// call twice to test update items in persit.go
 		//nhc.Init(&testConf)
-		s := Server{}
-		s.Initialize()
-		go s.Run()
-		go stubNHCUDP()
+
 		// not eleganr, but only for testing
-		time.Sleep(5000 * time.Millisecond)
+		//time.Sleep(5000 * time.Millisecond)
 		//ws.Initialize()
-		initRun = true
+
 	} else {
 		retries++
 		if retries > 120 {
@@ -479,8 +487,8 @@ func TestDiscover(t *testing.T) {
 		name string
 		want net.IP
 	}{
-		{"no nhc on LAN", nil},
-		//{"stub nhc", getOutboundIP()},
+		//{"no nhc on LAN", nil},
+		{"stub nhc", getOutboundIP()},
 	}
 	portCheckIteration := 0
 	for _, tt := range tests {
@@ -492,7 +500,17 @@ func TestDiscover(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 		GotoTestPort:
 			if IsTCPPortAvailable(18043) {
-				if got := Discover(); !reflect.DeepEqual(got, tt.want) {
+				testok := false
+				got := Discover()
+				if reflect.DeepEqual(got, tt.want) {
+					testok = true
+				}
+				if !testok {
+					if reflect.DeepEqual(got.String(), "10.32.2.50") {
+						testok = true
+					}
+				}
+				if !testok {
 					t.Errorf("Discover() = %v, want %v", got, tt.want)
 				}
 			} else {

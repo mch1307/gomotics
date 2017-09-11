@@ -10,6 +10,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/mch1307/gomotics/config"
 	"github.com/mch1307/gomotics/log"
+	//"github.com/mch1307/gomotics/server"
 )
 
 // HealthMsg static alive json for health endpoint
@@ -25,8 +26,14 @@ type Server struct {
 	LogFile    string
 }
 
-func init() {
-	//log.Init()
+// Start Initialize and starts the server
+func Start(conf string) {
+	config.Initialize(conf)
+	log.Init()
+	s := Server{}
+	s.Initialize()
+	s.Run()
+	NhcInit(&config.Conf.NhcConfig)
 	fmt.Println("Starting gomotics")
 }
 
