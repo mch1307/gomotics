@@ -142,7 +142,8 @@ func InitStubNHC() {
 		s.Initialize()
 		go s.Run()
 		go stubNHCUDP()
-		time.Sleep(4000 * time.Millisecond)
+		// not eleganr, but only for testing
+		time.Sleep(5000 * time.Millisecond)
 		//ws.Initialize()
 		initRun = true
 	} else {
@@ -478,8 +479,8 @@ func TestDiscover(t *testing.T) {
 		name string
 		want net.IP
 	}{
-		//{"no nhc on LAN", nil},
-		{"stub nhc", getOutboundIP()},
+		{"no nhc on LAN", nil},
+		//{"stub nhc", getOutboundIP()},
 	}
 	portCheckIteration := 0
 	for _, tt := range tests {
