@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -133,7 +134,7 @@ func InitStubNHC() {
 		config.Conf.ServerConfig.LogLevel = "DEBUG"
 		go MockNHC()
 		go NhcListener()
-		time.Sleep(500 * time.Millisecond)
+		time.Sleep(1000 * time.Millisecond)
 		//nhc.Init(&testConf)
 		// call twice to test update items in persit.go
 		//nhc.Init(&testConf)
@@ -238,7 +239,7 @@ func TestHealth(t *testing.T) {
 	}
 }
 
-/* func TestGetNhcInfo(t *testing.T) {
+func TestGetNhcInfo(t *testing.T) {
 	expected := "1.10.0.34209"
 	url := baseUrl + "/api/v1/nhc/info"
 	hCli := http.Client{
@@ -263,7 +264,7 @@ func TestHealth(t *testing.T) {
 	if res.Swversion != expected {
 		t.Errorf("TestGetNhcInfo failed, expecting %v, got %v", expected, res.Swversion)
 	}
-} */
+}
 
 // TODO: add more test cases (test non existing item)
 func Test_getNhcItem(t *testing.T) {
@@ -306,7 +307,7 @@ func Test_getNhcItems(t *testing.T) {
 	}
 }
 
-/* func Test_nhcCmd(t *testing.T) {
+func Test_nhcCmd(t *testing.T) {
 	expected := "Success"
 	url := baseUrl + "/api/v1/nhc/1/100"
 	hCli := http.Client{
@@ -329,7 +330,7 @@ func Test_getNhcItems(t *testing.T) {
 	if string(got) != expected {
 		t.Errorf("Test_nhcCmd failed, expecting %v, got %v", expected, string(got))
 	}
-} */
+}
 
 func wsDial(url string) (wsConn *websocket.Conn, ok bool, err error) {
 	webS, _, err := websocket.DefaultDialer.Dial(url, nil)
@@ -470,7 +471,7 @@ func getOutboundIP() net.IP {
 	return localAddr.IP
 }
 
-/* func TestDiscover(t *testing.T) {
+func TestDiscover(t *testing.T) {
 
 	tests := []struct {
 		name string
@@ -505,7 +506,7 @@ func getOutboundIP() net.IP {
 			}
 		})
 	}
-} */
+}
 
 func TestGetLocation(t *testing.T) {
 	id := 2
