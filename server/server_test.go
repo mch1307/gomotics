@@ -141,7 +141,7 @@ func InitStubNHC() {
 		s := Server{}
 		s.Initialize()
 		go s.Run()
-		time.Sleep(2000 * time.Millisecond)
+		time.Sleep(4000 * time.Millisecond)
 		//ws.Initialize()
 		initRun = true
 	} else {
@@ -162,7 +162,7 @@ func MockNHC() {
 		os.Exit(1)
 	}
 	// Close the listener when the application closes.
-	defer l.Close()
+	//defer l.Close()
 	fmt.Println("Listening on " + ConnectHost + ":" + ConnectPort)
 	for {
 		// Listen for an incoming connection.
@@ -478,7 +478,7 @@ func TestDiscover(t *testing.T) {
 		want net.IP
 	}{
 		{"no nhc on LAN", nil},
-		//{"stub nhc", getOutboundIP()},
+		{"stub nhc", getOutboundIP()},
 	}
 	portCheckIteration := 0
 	for _, tt := range tests {
