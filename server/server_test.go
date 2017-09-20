@@ -31,6 +31,7 @@ var url = "ws://localhost:8081/events"
 func TestMain(m *testing.M) {
 	fmt.Println("TestMain: starting stub")
 	InitStubNHC()
+	//stubNHCUDP()
 	ret := m.Run()
 	os.Exit(ret)
 }
@@ -454,7 +455,7 @@ func stubNHCTCP() {
 func stubNHCUDP() {
 	// listen to incoming udp packets
 	fmt.Println("starting UDP stub")
-	pc, err := net.ListenPacket("udp", "0.0.0.0:10000")
+	pc, err := net.ListenPacket("udp", getOutboundIP().String()+":10000")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -466,6 +467,7 @@ func stubNHCUDP() {
 	_, addr, _ = pc.ReadFrom(buffer)
 
 	//simple write
+	fmt.Println("stubNhcUdp :", addr.String())
 	pc.WriteTo([]byte("NHC Stub"), addr)
 }
 
@@ -475,9 +477,8 @@ func getOutboundIP() net.IP {
 		log.Fatal(err)
 	}
 	defer conn.Close()
-
 	localAddr := conn.LocalAddr().(*net.UDPAddr)
-
+	fmt.Println("get ip: ", localAddr.IP.String())
 	return localAddr.IP
 }
 
@@ -513,6 +514,7 @@ func TestDiscover(t *testing.T) {
 				if !testok {
 					t.Errorf("Discover() = %v, want %v", got, tt.want)
 				}
+				fmt.Printf("OK Discover() = %v, want %v", got, tt.want.String())
 			} else {
 				portCheckIteration++
 				if portCheckIteration < 21 {
