@@ -454,12 +454,12 @@ func stubNHCTCP() {
 
 func stubNHCUDP() {
 	// listen to incoming udp packets
-	fmt.Println("starting UDP stub")
+	fmt.Println("starting UDP stub on ", getOutboundIP().String()+":10000")
 	pc, err := net.ListenPacket("udp", getOutboundIP().String()+":10000")
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer pc.Close()
+	//defer pc.Close()
 
 	//simple read
 	buffer := make([]byte, 1024)
