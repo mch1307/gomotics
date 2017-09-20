@@ -478,7 +478,7 @@ func getOutboundIP() net.IP {
 	}
 	defer conn.Close()
 	localAddr := conn.LocalAddr().(*net.UDPAddr)
-	fmt.Println("get ip: ", localAddr.IP.String())
+	//fmt.Println("get ip: ", localAddr.IP.String())
 	return localAddr.IP
 }
 
@@ -488,8 +488,8 @@ func TestDiscover(t *testing.T) {
 		name string
 		want net.IP
 	}{
-		//{"no nhc on LAN", nil},
-		{"stub nhc", getOutboundIP()},
+		{"no nhc on LAN", nil},
+		//{"stub nhc", getOutboundIP()},
 	}
 	portCheckIteration := 0
 	for _, tt := range tests {
