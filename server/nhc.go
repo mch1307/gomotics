@@ -208,7 +208,7 @@ func Discover() net.IP {
 			//			return
 		}
 	}()
-	time.Sleep(time.Second * 3)
+	time.Sleep(time.Second * 6)
 	return nhcConnectString
 }
 
