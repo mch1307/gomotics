@@ -493,11 +493,11 @@ func TestDiscover(t *testing.T) {
 	}
 	portCheckIteration := 0
 	for _, tt := range tests {
-		fmt.Println("starting test ", tt.name)
-		/* 		if tt.want != nil {
+		fmt.Println("starting test ", tt.name, getOutboundIP())
+		if tt.want != nil {
 			go stubNHCUDP()
 			//go stubNHCTCP()
-		} */
+		}
 		t.Run(tt.name, func(t *testing.T) {
 		GotoTestPort:
 			if IsTCPPortAvailable(18043) {
