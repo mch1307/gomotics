@@ -25,6 +25,8 @@ func BuildItems() {
 		nhcItem.Name = rec.Name
 		nhcItem.Provider = "NHC"
 		nhcItem.State = rec.Value1
+		nhcItem.Value2 = rec.Value2
+		nhcItem.Value3 = rec.Value3
 		tmpLoc := GetLocation(rec.Location)
 		nhcItem.Location = tmpLoc.Name
 		items = append(items, nhcItem)
@@ -131,9 +133,9 @@ func ProcessEvent(evt types.Event) []byte {
 		event, _ = json.Marshal(item)
 		//server.WSPool.Broadcast <- event
 	} else {
-		log.Debug("no record found: item ", evt.ID)
+		log.Debug("no record found: item - ", evt.ID)
 	}
-	log.Debug("Nhc event processed for NHC action id:", evt.ID)
+	log.Debug("Nhc event processed for NHC action id: ", evt.ID)
 	return event
 }
 

@@ -40,6 +40,8 @@ type Item struct {
 	Name     string `json:"name"`
 	Location string `json:"location"`
 	State    int    `json:"state"`
+	Value2   int    `json:"value2"`
+	Value3   int    `json:"value3"`
 }
 
 // NHCSystemInfo hold the NHC system information
