@@ -454,8 +454,8 @@ func stubNHCTCP() {
 
 func stubNHCUDP() {
 	// listen to incoming udp packets
-	fmt.Println("starting UDP stub on ", getOutboundIP().String()+":10000")
-	pc, err := net.ListenPacket("udp", getOutboundIP().String()+":10000")
+	fmt.Println("starting UDP stub on ", GetOutboundIP().String()+":10000")
+	pc, err := net.ListenPacket("udp", GetOutboundIP().String()+":10000")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -471,7 +471,7 @@ func stubNHCUDP() {
 	pc.WriteTo([]byte("NHC Stub"), addr)
 }
 
-func getOutboundIP() net.IP {
+/* func getOutboundIP() net.IP {
 	conn, err := net.Dial("udp", "8.8.8.8:80")
 	if err != nil {
 		log.Fatal(err)
@@ -481,7 +481,7 @@ func getOutboundIP() net.IP {
 	//fmt.Println("get ip: ", localAddr.IP.String())
 	return localAddr.IP
 }
-
+*/
 func TestDiscover(t *testing.T) {
 
 	tests := []struct {
@@ -493,7 +493,7 @@ func TestDiscover(t *testing.T) {
 	}
 	portCheckIteration := 0
 	for _, tt := range tests {
-		fmt.Println("starting test ", tt.name, getOutboundIP())
+		fmt.Println("starting test ", tt.name, GetOutboundIP())
 		if tt.want != nil {
 			go stubNHCUDP()
 			//go stubNHCTCP()

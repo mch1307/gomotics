@@ -50,7 +50,7 @@ func (sc SimpleCmd) Stringify() string {
 	return string(tmp)
 }
 
-// Init sends list commands to NHC in order to get all equipments
+// NhcInit sends list commands to NHC in order to get all equipments
 func NhcInit(cfg *config.NhcConf) {
 	if len(cfg.Host) == 0 {
 		log.Debug("no nhc host in conf, starting discovery")
@@ -174,9 +174,9 @@ func Discover() net.IP {
 	var nhcConnectString net.IP
 	var targetAddr *net.UDPAddr
 	data, _ := hex.DecodeString("44")
-	addr := net.UDPAddr{IP: net.ParseIP("255.255.255.255"), Port: 10000}
+	addr := net.UDPAddr{IP: net.IPv4bcast, Port: 10000}
 
-	conn, err := net.ListenUDP("udp4", &net.UDPAddr{IP: net.IPv4zero, Port: 18043})
+	conn, err := net.ListenUDP("udp4", &net.UDPAddr{IP: GetOutboundIP(), Port: 18043})
 	if err != nil {
 		fmt.Println("err connect: ", err)
 	}
@@ -212,6 +212,7 @@ func Discover() net.IP {
 	return nhcConnectString
 }
 
+//ConnectNhc establish connection to Niko Home Control IP module
 func ConnectNhc(cfg *config.NhcConf) (conn *net.TCPConn, err error) {
 
 	connectString, err := net.ResolveTCPAddr("tcp", cfg.Host+":"+strconv.Itoa(cfg.Port))

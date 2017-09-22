@@ -3,6 +3,7 @@ package server
 //TODO: review the http handling (return code, ...)
 import (
 	"fmt"
+	"net"
 	"net/http"
 	"strconv"
 	"strings"
@@ -89,4 +90,16 @@ func (s *Server) Run() {
 func Health(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(HealthMsg))
+}
+
+// GetOutboundIP returns the IP address used for out access
+func GetOutboundIP() net.IP {
+	conn, err := net.Dial("udp", "8.8.8.8:80")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer conn.Close()
+	localAddr := conn.LocalAddr().(*net.UDPAddr)
+	//fmt.Println("get ip: ", localAddr.IP.String())
+	return localAddr.IP
 }
