@@ -130,28 +130,6 @@ func Errorf(format string, args ...interface{}) {
 	}).Errorf(format, args...)
 }
 
-// Panic logs a message at level Panic on the standard logger.
-func Panic(args ...interface{}) {
-	moreInfo := retrieveCallInfo()
-	log.WithFields(log.Fields{
-		"filename": moreInfo.fileName,
-		"package":  moreInfo.packageName,
-		"function": moreInfo.funcName,
-		"line":     moreInfo.line,
-	}).Panicln(args...)
-}
-
-// Panicf logs a message at level Panic on the standard logger.
-func Panicf(format string, args ...interface{}) {
-	moreInfo := retrieveCallInfo()
-	log.WithFields(log.Fields{
-		"filename": moreInfo.fileName,
-		"package":  moreInfo.packageName,
-		"function": moreInfo.funcName,
-		"line":     moreInfo.line,
-	}).Panicf(format, args...)
-}
-
 // Fatal logs a message at level Fatal on the standard logger.
 func Fatal(args ...interface{}) {
 	moreInfo := retrieveCallInfo()
