@@ -456,7 +456,7 @@ func TestDiscover(t *testing.T) {
 		want net.IP
 	}{
 		{"no nhc on LAN", nil},
-		{"stub nhc", GetOutboundIP()},
+		//{"stub nhc", GetOutboundIP()},
 	}
 	portCheckIteration := 0
 	for _, tt := range tests {
