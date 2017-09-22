@@ -217,7 +217,7 @@ func ConnectNhc(cfg *config.NhcConf) (conn *net.TCPConn, err error) {
 
 	connectString, err := net.ResolveTCPAddr("tcp", cfg.Host+":"+strconv.Itoa(cfg.Port))
 	if err != nil {
-		log.Fatal("connNhc ", err)
+		log.Error("connNhc ", err)
 		return nil, err
 	}
 

@@ -131,30 +131,10 @@ func InitStubNHC() {
 		go MockNHC()
 		go stubNHCUDP()
 		go Start("../config/test.toml")
-		//go Sub("../config/test.toml")
-		/* s := Server{}
-		s.Initialize()
-		s.Run() */
 		initRun = true
 		time.Sleep(5000 * time.Millisecond)
 		// Call nhcInit a second time to test updates
 		NhcInit(&config.Conf.NhcConfig)
-
-		/* 		config.Conf.NhcConfig.Host = ConnectHost
-		   		config.Conf.NhcConfig.Port, _ = strconv.Atoi(ConnectPort)
-		   		config.Conf.ServerConfig.ListenPort = 8081
-		   		config.Conf.ServerConfig.LogLevel = "DEBUG"
-		*/
-		//go NhcListener()
-		//time.Sleep(1000 * time.Millisecond)
-		//nhc.Init(&testConf)
-		// call twice to test update items in persit.go
-		//nhc.Init(&testConf)
-
-		// not eleganr, but only for testing
-		//time.Sleep(5000 * time.Millisecond)
-		//ws.Initialize()
-
 	} else {
 		retries++
 		if retries > 120 {
@@ -172,8 +152,6 @@ func MockNHC() {
 	if err != nil {
 		os.Exit(1)
 	}
-	// Close the listener when the application closes.
-	//defer l.Close()
 	fmt.Println("Listening on " + ConnectHost + ":" + ConnectPort)
 	for {
 		// Listen for an incoming connection.
@@ -441,7 +419,7 @@ func Test_tWS(t *testing.T) {
 
 func stubNHCTCP() {
 	// listen to incoming tcp connections
-	l, err := net.Listen("tcp", "0.0.0.0:8000")
+	l, err := net.Listen("tcp", GetOutboundIP().String()+":8000")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -471,17 +449,6 @@ func stubNHCUDP() {
 	pc.WriteTo([]byte("NHC Stub"), addr)
 }
 
-/* func getOutboundIP() net.IP {
-	conn, err := net.Dial("udp", "8.8.8.8:80")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer conn.Close()
-	localAddr := conn.LocalAddr().(*net.UDPAddr)
-	//fmt.Println("get ip: ", localAddr.IP.String())
-	return localAddr.IP
-}
-*/
 func TestDiscover(t *testing.T) {
 
 	tests := []struct {
@@ -489,13 +456,15 @@ func TestDiscover(t *testing.T) {
 		want net.IP
 	}{
 		{"no nhc on LAN", nil},
-		//{"stub nhc", getOutboundIP()},
+		{"stub nhc", GetOutboundIP()},
 	}
 	portCheckIteration := 0
 	for _, tt := range tests {
 		fmt.Println("starting test ", tt.name, GetOutboundIP())
 		if tt.want != nil {
 			go stubNHCUDP()
+			fmt.Println("Waiting 10 seconds")
+			time.Sleep(time.Second * 10)
 			//go stubNHCTCP()
 		}
 		t.Run(tt.name, func(t *testing.T) {
@@ -577,7 +546,7 @@ func TestGetItems(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := db.GetItems()
-			fmt.Println(len(got))
+			//fmt.Println(len(got))
 			db.Dump()
 			for _, item := range got {
 				if item.ID == tt.id {
@@ -593,8 +562,9 @@ func TestGetItems(t *testing.T) {
 
 func TestGetItem(t *testing.T) {
 	type test struct {
-		id   int
-		name string
+		id    int
+		name  string
+		found bool
 	}
 	//var compare test
 	tests := []struct {
@@ -603,40 +573,32 @@ func TestGetItem(t *testing.T) {
 	}{
 		{name: "test0",
 			res: test{id: 0,
-				name: "light"},
+				name:  "light",
+				found: true},
 		},
 		{name: "test1",
 			res: test{id: 1,
-				name: "power switch"},
+				name:  "power switch",
+				found: true},
+		},
+		{name: "test3",
+			res: test{id: 99,
+				name:  "power switch",
+				found: false},
 		},
 	}
-	/* 	{
-		{"fakeSwitch", {0, "light"}},
-		{"fakeSwitch", {1, "power switch"}},
-	} */
-
-	SendCommand(MyCmd.Stringify())
-	time.Sleep(300 * time.Millisecond)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			fmt.Println("starting test ", tt.name)
 			got, ok := db.GetItem(tt.res.id)
-			if !ok {
+			if ok != tt.res.found {
+				//if !ok {
 				t.Errorf("test %v failed for item %v", tt.name, tt.res.name)
 			}
 			fmt.Println("result: ", got.Name)
 		})
 	}
-	/* 		for _, tt := range tests {
-	   		t.Run(tt.name, func(t *testing.T) {
-	   			got := GetItem(tt.res.id)
-	   			compare.res.id = got.res.ID
-	   			compare.res.name = got.res.name
-	   			if got != compare {
-	   				t.Errorf("test %v failed for item %v", tt.name, tt.res.name)
-	   			}
-	   		}
-	   	} */
+
 }
 
 func TestSaveNhcSysInfo(t *testing.T) {

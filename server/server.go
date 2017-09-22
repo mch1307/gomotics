@@ -17,8 +17,6 @@ import (
 // HealthMsg static alive json for health endpoint
 const HealthMsg = `{"alive":true}`
 
-//var Clients *ClientPool
-
 // Server holds the gomotics app definition
 type Server struct {
 	Router     *mux.Router
@@ -60,20 +58,20 @@ func (s *Server) intializeRoutes() {
 	s.Router.HandleFunc("/events", ServeWebSocket).Methods("GET")
 
 	s.Router.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
-		t, err := route.GetPathTemplate()
-		if err != nil {
+		t, _ := route.GetPathTemplate()
+		/* 		if err != nil {
 			return err
-		}
+		} */
 		// p will contain regular expression is compatible with regular expression in Perl, Python, and other languages.
 		// for instance the regular expression for path '/articles/{id}' will be '^/articles/(?P<v0>[^/]+)$'
-		p, err := route.GetPathRegexp()
-		if err != nil {
+		p, _ := route.GetPathRegexp()
+		/* 		if err != nil {
 			return err
-		}
-		m, err := route.GetMethods()
-		if err != nil {
+		} */
+		m, _ := route.GetMethods()
+		/* 		if err != nil {
 			return err
-		}
+		} */
 		fmt.Println(strings.Join(m, ","), t, p)
 		log.Info(strings.Join(m, ","), t, p)
 		return nil
@@ -96,10 +94,9 @@ func Health(w http.ResponseWriter, r *http.Request) {
 func GetOutboundIP() net.IP {
 	conn, err := net.Dial("udp", "8.8.8.8:80")
 	if err != nil {
-		log.Fatal(err)
+		return net.IPv4zero
 	}
-	defer conn.Close()
 	localAddr := conn.LocalAddr().(*net.UDPAddr)
-	//fmt.Println("get ip: ", localAddr.IP.String())
+	defer conn.Close()
 	return localAddr.IP
 }
