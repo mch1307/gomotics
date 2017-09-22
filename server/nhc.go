@@ -223,7 +223,7 @@ func ConnectNhc(cfg *config.NhcConf) (conn *net.TCPConn, err error) {
 
 	conn, err = net.DialTCP("tcp", nil, connectString)
 	if err != nil {
-		log.Fatal("error connecting to nhc: ", err)
+		log.Error("error connecting to nhc: ", err)
 	}
 	return conn, err
 }
