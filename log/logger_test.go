@@ -85,6 +85,17 @@ func TestDebug(t *testing.T) {
 	}
 }
 
+func TestDebugf(t *testing.T) {
+	moreInfo := retrieveCallInfo()
+	level := "debugf"
+	str := "test " + level
+	Debugf(str)
+	res := searchLogMsg(str, moreInfo.funcName)
+	if res.Msg != str {
+		t.Error("test debugf: logged msg not found")
+	}
+}
+
 func TestInfo(t *testing.T) {
 	moreInfo := retrieveCallInfo()
 	level := "info"
@@ -153,19 +164,8 @@ func TestErrorf(t *testing.T) {
 	}
 }
 
-/* func TestFatal(t *testing.T) {
-	moreInfo := retrieveCallInfo()
-	level := "fatal"
-	str := "test " + level
-	Fatal(str, level)
-	//time.Sleep(300 * time.Millisecond)
-	res := searchLogMsg(str, moreInfo.funcName)
-	if res.Msg != "test error" {
-		t.Errorf("test %v: logged msg not found", level)
-	}
-} */
-
 func TestFatal(t *testing.T) {
+	fmt.Println("Starting test fatal")
 	moreInfo := retrieveCallInfo()
 	level := "fatal"
 	str := "test " + level
@@ -176,14 +176,18 @@ func TestFatal(t *testing.T) {
 	}
 
 	cmd := exec.Command(os.Args[0], "-test.run=TestFatal")
+	fmt.Println("args ", os.Args[0])
+	fmt.Println("command: ", cmd)
 	cmd.Env = append(os.Environ(), "FATAL=1")
 	err := cmd.Run()
+	fmt.Println("Error: ", err)
 	if e, ok := err.(*exec.ExitError); ok && !e.Success() {
+		fmt.Println("cmd in error .. ok")
 		res := searchLogMsg(str, moreInfo.funcName)
 		if res.Msg != str {
 			t.Errorf("test %v: logged msg not found", level)
 		} else {
-			fmt.Println(res.Msg)
+			//fmt.Println(res.Msg)
 			return
 		}
 	}
