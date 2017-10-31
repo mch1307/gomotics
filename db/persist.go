@@ -2,6 +2,7 @@ package db
 
 import (
 	"encoding/json"
+	"strconv"
 
 	"github.com/mch1307/gomotics/log"
 	"github.com/mch1307/gomotics/types"
@@ -14,6 +15,34 @@ var (
 	nhcInfo       types.NHCSystemInfo
 )
 
+// itemType stores the external to internal item types
+type itemType struct {
+	Provider     string
+	ProviderType string
+	InternalType string
+}
+
+var itemTypes []itemType
+
+func init() {
+	itemTypes = []itemType{
+		{Provider: "NHC", ProviderType: "1", InternalType: "switch"},
+		{Provider: "NHC", ProviderType: "2", InternalType: "dimmer"},
+		{Provider: "NHC", ProviderType: "4", InternalType: "blind"},
+	}
+}
+
+// GetInternalType return the internal device type
+func GetInternalType(provider, pType string) (internalType string) {
+
+	for _, item := range itemTypes {
+		if item.Provider == provider && item.ProviderType == pType {
+			return item.InternalType
+		}
+	}
+	return ""
+}
+
 // BuildItems builds the collection of NHC items
 // "merges" actions and locations
 func BuildItems() {
@@ -24,6 +53,7 @@ func BuildItems() {
 		nhcItem.ID = rec.ID
 		nhcItem.Name = rec.Name
 		nhcItem.Provider = "NHC"
+		nhcItem.Type = GetInternalType("NHC", strconv.Itoa(rec.Type))
 		nhcItem.State = rec.Value1
 		nhcItem.Value2 = rec.Value2
 		nhcItem.Value3 = rec.Value3

@@ -2,6 +2,13 @@ package types
 
 import "encoding/json"
 
+//ItemType stores the external to internal item types
+type ItemType struct {
+	Provider     string
+	ProviderType string
+	InternalType string
+}
+
 // Message generic struct to hold nhc messages
 // used to identify the message type before further parsing
 type Message struct {
@@ -33,19 +40,34 @@ type Location struct {
 	Name string
 }
 
-// Item NHC equipment definition
+// Item represents a registered item
+//
+// swagger:model
 type Item struct {
+	// the provider
+	// required: true
 	Provider string `json:"provider"`
-	ID       int    `json:"id"`
-	Name     string `json:"name"`
+	// the id of this item
+	ID int `json:"id"`
+	// the type of this item
+	// can be switch, dimmer or blind
+	Type string `json:"type"`
+	// the name of the item
+	Name string `json:"name"`
+	// the location of the item
 	Location string `json:"location"`
-	State    int    `json:"state"`
-	Value2   int    `json:"value2"`
-	Value3   int    `json:"value3"`
+	// the current state of the item
+	State int `json:"state"`
+	// other value of the item
+	Value2 int `json:"value2"`
+	// other value of the item
+	Value3 int `json:"value3"`
 }
 
 // NHCSystemInfo hold the NHC system information
+// swagger:model
 type NHCSystemInfo struct {
+	// NHC Software version
 	Swversion       string `json:"swversion"`
 	API             string `json:"api"`
 	Time            string `json:"time"`
