@@ -1,0 +1,99 @@
+{
+  "swagger": "2.0",
+  "paths": {
+    "/events": {
+      "get": {
+        "description": "Websocket endpoint providing updated items in realtime.",
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "ws",
+          "wss"
+        ],
+        "tags": [
+          "Websocket",
+          "endpoint",
+          "providing",
+          "updated",
+          "items",
+          "in"
+        ],
+        "summary": "Update on items in realtime",
+        "operationId": "realtime"
+      }
+    },
+    "/nhc": {
+      "get": {
+        "description": "This will show all registered NHC items.",
+        "consumes": [
+          "application/json",
+          "application/x-protobuf"
+        ],
+        "produces": [
+          "application/json",
+          "application/x-protobuf"
+        ],
+        "schemes": [
+          "http",
+          "https",
+          "ws",
+          "wss"
+        ],
+        "tags": [
+          "List",
+          "NHC",
+          "registered"
+        ],
+        "summary": "Lists all registered NHC items.",
+        "operationId": "items",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/someResponse"
+          },
+          "422": {
+            "$ref": "#/responses/validationError"
+          },
+          "default": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      }
+    },
+    "/nhc/info": {
+      "post": {
+        "consumes": [
+          "application/json",
+          "application/x-protobuf"
+        ],
+        "produces": [
+          "application/json",
+          "application/x-protobuf"
+        ],
+        "schemes": [
+          "http",
+          "https",
+          "ws",
+          "wss"
+        ],
+        "tags": [
+          "Get",
+          "NHC",
+          "controller"
+        ],
+        "operationId": "info",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/someResponse"
+          },
+          "422": {
+            "$ref": "#/responses/validationError"
+          },
+          "default": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      }
+    }
+  }
+}
