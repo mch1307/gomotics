@@ -119,6 +119,7 @@ func NhcListener() {
 		if err := reader.Decode(&nhcMessage); err != nil {
 			log.Errorf("error decoding NHC message %v", err)
 		}
+		log.Debug(nhcMessage)
 		if nhcMessage.Cmd == "startevents" {
 			log.Info("listener registered")
 			nhcMessage.Cmd = "dropme"
