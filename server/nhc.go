@@ -50,8 +50,8 @@ func (sc SimpleCmd) Stringify() string {
 	return string(tmp)
 }
 
-// NhcInit sends list commands to NHC in order to get all equipments
-func NhcInit(cfg *config.NhcConf) {
+// nhcInit sends list commands to NHC in order to get all equipments
+func nhcInit(cfg *config.NhcConf) {
 	if len(cfg.Host) == 0 {
 		log.Debug("no nhc host in conf, starting discovery")
 		nhcHost := Discover()
@@ -95,7 +95,7 @@ func NhcInit(cfg *config.NhcConf) {
 
 	defer conn.Close()
 	// Build the nhc collection
-	db.BuildItems()
+	db.BuildNHCItems()
 	if config.Conf.ServerConfig.LogLevel == "DEBUG" {
 		db.Dump()
 	}
@@ -139,7 +139,7 @@ func Route(msg *types.Message) {
 		} */
 		_ = json.Unmarshal(msg.Data, &nhcLocations)
 		for idx := range nhcLocations {
-			db.SaveLocation(nhcLocations[idx])
+			db.SaveNHCLocation(nhcLocations[idx])
 			//db.SaveItem(nhcLocations[idx])
 		}
 	} else if msg.Cmd == "listactions" {
@@ -148,7 +148,7 @@ func Route(msg *types.Message) {
 		} */
 		_ = json.Unmarshal(msg.Data, &nhcActions)
 		for idx := range nhcActions {
-			db.SaveAction(nhcActions[idx])
+			db.SaveNHCAction(nhcActions[idx])
 			//db.SaveItem(nhcActions[idx])
 		}
 	} else if msg.Event == "listactions" {
@@ -158,7 +158,7 @@ func Route(msg *types.Message) {
 		msg.Event = "dropme"
 		_ = json.Unmarshal(msg.Data, &nhcEvent)
 		for _, rec := range nhcEvent {
-			WSPool.Broadcast <- db.ProcessEvent(rec)
+			WSPool.Broadcast <- db.ProcessNHCEvent(rec)
 			//db.SaveItem(nhcEvent[idx])
 		}
 	} else if msg.Cmd == "systeminfo" {

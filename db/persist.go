@@ -9,10 +9,14 @@ import (
 )
 
 var (
-	actionsColl   []types.Action
-	locationsColl []types.Location
-	items         []types.Item
-	nhcInfo       types.NHCSystemInfo
+	nhcActionsColl   []types.Action
+	nhcLocationsColl []types.Location
+	nhcItems         []types.NHCItem
+	nhcInfo          types.NHCSystemInfo
+	jeedomItems      []types.JeedomEquipment
+	jeedomLocations  []types.JeedomLocation
+	jeedomCMDs       []types.JeedomCMD
+	//jeedomObjects []types.JeedomObjectFull
 )
 
 // itemType stores the external to internal item types
@@ -43,13 +47,70 @@ func GetInternalType(provider, pType string) (internalType string) {
 	return ""
 }
 
-// BuildItems builds the collection of NHC items
+// SaveJeedomLocation save Jeedom object (location) to collection
+func SaveJeedomLocation(loc types.JeedomLocation) {
+	found := false
+	if len(jeedomLocations) > 0 {
+		// lookup existing rec
+		for idx, val := range jeedomLocations {
+			if val.ID == loc.ID {
+				jeedomLocations[idx] = loc
+				found = true
+				log.Debug("Jeedom loc ID %v found and updated", loc.ID)
+			}
+		}
+	}
+	if !found {
+		jeedomLocations = append(jeedomLocations, loc)
+		log.Debug("Jeedom Loc ID %v not found, inserted", loc.ID)
+	}
+}
+
+// SaveJeedomItem save Jeedom equipment to collection
+func SaveJeedomItem(item types.JeedomEquipment) {
+	found := false
+	// lookup coll if record already exist
+	for idx, val := range jeedomItems {
+		if val.ID == item.ID {
+			jeedomItems[idx] = item
+			found = true
+			log.Debug("Jeedom Item ID %v found and updated", item.ID)
+		}
+	}
+	if !found {
+		jeedomItems = append(jeedomItems, item)
+		log.Debug("Jeedom Item ID %v not found, inserted", item.ID)
+	}
+
+}
+
+// SaveJeedomCmd save Jeedom equipment to collection
+func SaveJeedomCMD(cmd types.JeedomCMD) {
+	found := false
+	// lookup coll if record already exist
+	for idx, val := range jeedomCMDs {
+		if val.ID == cmd.ID {
+			jeedomCMDs[idx] = cmd
+			found = true
+			log.Debug("Jeedom CMD ID %v found and updated", cmd.ID)
+		}
+	}
+	if !found {
+		jeedomCMDs = append(jeedomCMDs, cmd)
+		log.Debug("Jeedom CMD ID %v not found, inserted", cmd.ID)
+	}
+
+}
+
+// BuildJeedomItems
+
+// BuildNHCItems builds the collection of NHC items
 // "merges" actions and locations
-func BuildItems() {
-	var nhcItem types.Item
+func BuildNHCItems() {
+	var nhcItem types.NHCItem
 	// loop through NHC raw actions collection
 	// and build items collection
-	for _, rec := range actionsColl {
+	for _, rec := range nhcActionsColl {
 		nhcItem.ID = rec.ID
 		nhcItem.Name = rec.Name
 		nhcItem.Provider = "NHC"
@@ -57,21 +118,21 @@ func BuildItems() {
 		nhcItem.State = rec.Value1
 		nhcItem.Value2 = rec.Value2
 		nhcItem.Value3 = rec.Value3
-		tmpLoc := GetLocation(rec.Location)
+		tmpLoc := getNHCLocation(rec.Location)
 		nhcItem.Location = tmpLoc.Name
-		items = append(items, nhcItem)
+		nhcItems = append(nhcItems, nhcItem)
 	}
 	log.Debug("itemsCollection built")
 }
 
-// SaveAction insert/update action in collection
-func SaveAction(act types.Action) {
+// SaveNHCAction insert/update action in collection
+func SaveNHCAction(act types.Action) {
 	found := false
 	// first lookup if action already exist
-	if len(actionsColl) > 0 {
-		for idx, item := range actionsColl {
+	if len(nhcActionsColl) > 0 {
+		for idx, item := range nhcActionsColl {
 			if item.ID == act.ID {
-				actionsColl[idx] = act
+				nhcActionsColl[idx] = act
 				log.Debug("Nhc ID %v found and updated", act.ID)
 				found = true
 			}
@@ -79,15 +140,15 @@ func SaveAction(act types.Action) {
 	}
 	if !found {
 		log.Debugf("Nhc ID %v not found -> inserted", act.ID)
-		actionsColl = append(actionsColl, act)
+		nhcActionsColl = append(nhcActionsColl, act)
 	}
 }
 
-// GetAction gets nhc action from collection
-func GetAction(id int) types.Action {
+// getNHCAction gets nhc action from collection
+func getNHCAction(id int) types.Action {
 	var ret types.Action
-	for idx, val := range actionsColl {
-		if actionsColl[idx].ID == id {
+	for idx, val := range nhcActionsColl {
+		if nhcActionsColl[idx].ID == id {
 			log.Debugf("Nhc ID %v found", id)
 			ret = val
 		}
@@ -95,16 +156,16 @@ func GetAction(id int) types.Action {
 	return ret
 }
 
-// GetItems lists all NHC items from items collection
-func GetItems() []types.Item {
-	return items
+// GetNHCItems lists all NHC items from items collection
+func GetNHCItems() []types.NHCItem {
+	return nhcItems
 }
 
-// GetItem return specific item
-func GetItem(id int) (it types.Item, found bool) {
+// GetNHCItem return specific item
+func GetNHCItem(id int) (it types.NHCItem, found bool) {
 	found = false
-	tmp := GetItems()
-	var resp types.Item
+	tmp := GetNHCItems()
+	var resp types.NHCItem
 	for _, val := range tmp {
 		if val.ID == id {
 			resp = val
@@ -114,30 +175,30 @@ func GetItem(id int) (it types.Item, found bool) {
 	return resp, found
 }
 
-// SaveLocation insert/update location in collection
-func SaveLocation(loc types.Location) {
+// SaveNHCLocation insert/update location in collection
+func SaveNHCLocation(loc types.Location) {
 	// first lookup if action already exist
 	found := false
-	if len(locationsColl) > 0 {
-		for idx, item := range locationsColl {
+	if len(nhcLocationsColl) > 0 {
+		for idx, item := range nhcLocationsColl {
 			if item.ID == loc.ID {
-				locationsColl[idx] = loc
+				nhcLocationsColl[idx] = loc
 				log.Debugf("Nhc location with ID %v found and updated", loc.ID)
 				found = true
 			}
 		}
 	}
 	if !found {
-		locationsColl = append(locationsColl, loc)
+		nhcLocationsColl = append(nhcLocationsColl, loc)
 		log.Debug("Nhc location with ID %v not found -> created", loc.ID)
 	}
 }
 
-// GetLocation gets nhc action from collection
-func GetLocation(id int) types.Location {
+// getNHCLocation gets nhc action from collection
+func getNHCLocation(id int) types.Location {
 	var ret types.Location
-	for idx, val := range locationsColl {
-		if locationsColl[idx].ID == id {
+	for idx, val := range nhcLocationsColl {
+		if nhcLocationsColl[idx].ID == id {
 			log.Debugf("Nhc location with ID %v found", id)
 			ret = val
 		}
@@ -145,19 +206,19 @@ func GetLocation(id int) types.Location {
 	return ret
 }
 
-// ProcessEvent saves new state of nhc equipment to relevant collections
-func ProcessEvent(evt types.Event) []byte {
-	for idx := range actionsColl {
-		if actionsColl[idx].ID == evt.ID {
-			actionsColl[idx].Value1 = evt.Value
+// ProcessNHCEvent saves new state of nhc equipment to relevant collections
+func ProcessNHCEvent(evt types.Event) []byte {
+	for idx := range nhcActionsColl {
+		if nhcActionsColl[idx].ID == evt.ID {
+			nhcActionsColl[idx].Value1 = evt.Value
 		}
 	}
-	for idx := range items {
-		if items[idx].ID == evt.ID {
-			items[idx].State = evt.Value
+	for idx := range nhcItems {
+		if nhcItems[idx].ID == evt.ID {
+			nhcItems[idx].State = evt.Value
 		}
 	}
-	item, found := GetItem(evt.ID)
+	item, found := GetNHCItem(evt.ID)
 	var event []byte
 	if found {
 		event, _ = json.Marshal(item)
@@ -171,8 +232,8 @@ func ProcessEvent(evt types.Event) []byte {
 
 // Dump save collections to log file (debug)
 func Dump() {
-	log.Debug("NHC actions: ", actionsColl)
-	log.Debug("NHC actions: ", locationsColl)
+	log.Debug("NHC actions: ", nhcActionsColl)
+	log.Debug("NHC actions: ", nhcLocationsColl)
 }
 
 // SaveNhcSysInfo saves the NHC system information in mem

@@ -34,7 +34,7 @@ func (s *Server) Initialize() {
 	s.Router = mux.NewRouter().StrictSlash(true)
 	s.intializeRoutes()
 	// Initialize NHC in memory db
-	NhcInit(&config.Conf.NhcConfig)
+	nhcInit(&config.Conf.NhcConfig)
 }
 
 func (s *Server) intializeRoutes() {
@@ -166,7 +166,7 @@ func Start(conf string) {
 	s := Server{}
 	s.Initialize()
 	s.Run()
-	NhcInit(&config.Conf.NhcConfig)
+	//nhcInit(&config.Conf.NhcConfig)
 	fmt.Println("Starting gomotics")
 }
 

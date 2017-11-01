@@ -48,7 +48,7 @@ func GetNhcInfo(w http.ResponseWriter, r *http.Request) {
 
 // GetNhcItems handler for /api/v1/nhc/
 func GetNhcItems(w http.ResponseWriter, r *http.Request) {
-	tmp := db.GetItems()
+	tmp := db.GetNHCItems()
 	resp, _ := json.Marshal(tmp)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(resp)
@@ -59,9 +59,9 @@ func GetNhcItem(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	found := false
 	params := mux.Vars(r)
-	tmp := db.GetItems()
+	tmp := db.GetNHCItems()
 	//fmt.Println("getnhcItem arg: ", params["id"])
-	var resp types.Item
+	var resp types.NHCItem
 	for _, val := range tmp {
 		if i, _ := strconv.Atoi(params["id"]); val.ID == i {
 			//fmt.Println("in if", params["id"], i)
