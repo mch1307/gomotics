@@ -19,11 +19,17 @@ func TestInitialize(t *testing.T) {
 	cfg.ServerConfig.ListenPort = 8081
 	cfg.ServerConfig.LogLevel = "DEBUG"
 	cfg.ServerConfig.LogPath = "."
+	cfg.JeedomConfig.URL = "http://jeedom/core/api/jeeApi.php"
+	cfg.JeedomConfig.APIKey = "abcdefgh1234"
+	cfg.JeedomConfig.Enabled = true
 	cfgDefault.NhcConfig.Host = ""
 	cfgDefault.NhcConfig.Port = 0
 	cfgDefault.ServerConfig.ListenPort = 8081
 	cfgDefault.ServerConfig.LogLevel = "INFO"
 	cfgDefault.ServerConfig.LogPath, _ = os.Getwd()
+	cfgDefault.JeedomConfig.URL = ""
+	cfgDefault.JeedomConfig.APIKey = ""
+	cfgDefault.JeedomConfig.Enabled = false
 	tests := []struct {
 		name     string
 		confFile string
@@ -43,6 +49,9 @@ func TestInitialize(t *testing.T) {
 			Conf.NhcConfig.Host = ""
 			Conf.NhcConfig.Port = 0
 			Conf.ServerConfig.LogLevel = ""
+			Conf.JeedomConfig.URL = ""
+			Conf.JeedomConfig.APIKey = ""
+			Conf.JeedomConfig.Enabled = false
 		})
 	}
 }

@@ -4,7 +4,7 @@ LogLevel = "DEBUG"
 LogPath = "."
 
 [nhc]
-host =          "10.32.2.50"
+host =          "localhost"
 port =          8000
 
 [jeedom]

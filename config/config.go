@@ -40,7 +40,7 @@ var Conf GlobalConfig
 
 // Initialize populates the Conf variable
 func Initialize(cfg string) {
-
+	Conf.JeedomConfig.Enabled = false
 	if _, err := os.Stat(cfg); err != nil {
 		//fmt.Println("Invalid config file/path: ", err)
 		wrkDir, _ := os.Getwd()
