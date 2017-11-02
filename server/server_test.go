@@ -95,7 +95,7 @@ func PopFakeNhc() {
 		Route(&fakeLocationsMsg)
 		json.Unmarshal([]byte(actions), &fakeActionsMsg)
 		Route(&fakeActionsMsg)
-		db.BuildItems()
+		db.BuildNHCItems()
 		popFakeRun = true
 	}
 }
@@ -265,7 +265,7 @@ func Test_getNhcItem(t *testing.T) {
 	handler := http.HandlerFunc(GetNhcItem)
 	handler.ServeHTTP(rr, req)
 	expected := "light"
-	var res types.Item
+	var res types.NHCItem
 	json.Unmarshal(rr.Body.Bytes(), &res)
 	if res.Name != expected {
 		t.Errorf("getNhcItem failed: got %v, expect: %v", res, expected)
@@ -282,7 +282,7 @@ func Test_getNhcItems(t *testing.T) {
 	handler.ServeHTTP(rr, req)
 	var found bool
 	expected := "light"
-	var res []types.Item
+	var res []types.NHCItem
 	json.Unmarshal(rr.Body.Bytes(), &res)
 	for _, val := range res {
 		if val.ID == 0 {
@@ -348,7 +348,7 @@ func Test_tWS(t *testing.T) {
 		{"action1", 1, "power switch", "Kitchen", 100},
 	}
 	//fmt.Println("# tests: ", len(tests))
-	var msg types.Item
+	var msg types.NHCItem
 	//time.Sleep(time.Second * 2)
 	if wsConn, ok, err = wsDial(url); !ok {
 		if retry < 11 {
@@ -504,13 +504,13 @@ func TestGetLocation(t *testing.T) {
 	//expect := "Living Room"
 	expect := "Kitchen"
 	t.Run("location", func(t *testing.T) {
-		if got := db.GetLocation(id); !reflect.DeepEqual(got.Name, expect) {
+		if got := db.GetNHCLocation(id); !reflect.DeepEqual(got.Name, expect) {
 			t.Errorf("getLocation() = %v, expected %v", got.Name, expect)
 		}
 	})
 }
 
-func TestGetAction(t *testing.T) {
+func TestGetNHCAction(t *testing.T) {
 	tests := []struct {
 		name       string
 		arg        int
@@ -522,7 +522,7 @@ func TestGetAction(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := db.GetAction(tt.arg)
+			got := db.GetNHCAction(tt.arg)
 			if !reflect.DeepEqual(got.Name, tt.exName) {
 				t.Errorf("GetAction() name = %v, want %v", got.Name, tt.exName)
 			} else if !reflect.DeepEqual(got.Name, tt.exName) {
@@ -545,7 +545,7 @@ func TestGetItems(t *testing.T) {
 	time.Sleep(300 * time.Millisecond)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := db.GetItems()
+			got := db.GetNHCItems()
 			//fmt.Println(len(got))
 			db.Dump()
 			for _, item := range got {
@@ -590,7 +590,7 @@ func TestGetItem(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			fmt.Println("starting test ", tt.name)
-			got, ok := db.GetItem(tt.res.id)
+			got, ok := db.GetNHCItem(tt.res.id)
 			if ok != tt.res.found {
 				//if !ok {
 				t.Errorf("test %v failed for item %v", tt.name, tt.res.name)
