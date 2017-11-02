@@ -1,4 +1,4 @@
-# gomotics [WIP]
+# gomotics
 
 [![GitHub release](https://img.shields.io/github/release/mch1307/gomotics.svg)](https://github.com/mch1307/gomotics/releases)
 [![Travis branch](https://img.shields.io/travis/mch1307/gomotics/master.svg)](https://travis-ci.org/mch1307/gomotics)
