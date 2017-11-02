@@ -6,16 +6,13 @@
 [![Go Report Card](https://goreportcard.com/badge/mch1307/gomotics)](http://goreportcard.com/report/mch1307/gomotics)
 [![license](https://img.shields.io/github/license/mch1307/gomotics.svg)](https://github.com/mch1307/gomotics/blob/master/LICENSE.md) [![](https://images.microbadger.com/badges/image/mch1307/gomotics.svg)](https://microbadger.com/images/mch1307/gomotics "Get your own image badge on microbadger.com")
 
-[Work In Progress]
-
-Go API server for interfacing different domotics components/systems
-
-Currently supported: Niko Home Control
+Go API server for Niko Home Control
 
 "Roadmap": 
 
-* GUI
-* link with Jeedom
+- [X] link with Jeedom
+- [ ] GUI?
+
 
 More information/doc on https://blog.csnet.me/gomotics/
 
@@ -32,13 +29,29 @@ A docker image is automatically build with Travis-CI. It is available on [Docker
 Download your platform binary from the release page, extract the executable from the archive. 
 
 ## Running
-gomotics will run with default config if you do not provide a configuration file. If you need specific parameters, provide a toml config file as follows:
+gomotics will run with default config if you do not provide a configuration file. If you want to link gomotics with Jeedom, provide the Jeedom URL and API key as follows
+
+```
+[jeedom]
+url = "http://jeedom/core/api/jeeApi.php"
+apikey = "abcdefgh1234"
+```
+A complete config file would like as follows:
 
 ``` 
 [server]
+[server]
 ListenPort = 8081
-LogLevel = "INFO"
-LogPath = "/var/log"
+LogLevel = "DEBUG"
+LogPath = "."
+
+[nhc]
+host =          "x.x.x.x"
+port =          8000
+
+[jeedom]
+url = "http://jeedom-host/core/api/jeeApi.php"
+apikey = "abcdefgh1234"
 ```
 
 Then start gomotics as follows:
