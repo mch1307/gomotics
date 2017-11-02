@@ -9,4 +9,4 @@ port =          8000
 
 [jeedom]
 url = "http://jeedom/core/api/jeeApi.php"
-apikey = "abcdefgh1234"
+apikey = ""

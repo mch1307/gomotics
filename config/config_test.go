@@ -20,8 +20,8 @@ func TestInitialize(t *testing.T) {
 	cfg.ServerConfig.LogLevel = "DEBUG"
 	cfg.ServerConfig.LogPath = "."
 	cfg.JeedomConfig.URL = "http://jeedom/core/api/jeeApi.php"
-	cfg.JeedomConfig.APIKey = "abcdefgh1234"
-	cfg.JeedomConfig.Enabled = true
+	cfg.JeedomConfig.APIKey = ""
+	cfg.JeedomConfig.Enabled = false
 	cfgDefault.NhcConfig.Host = ""
 	cfgDefault.NhcConfig.Port = 0
 	cfgDefault.ServerConfig.ListenPort = 8081
