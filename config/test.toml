@@ -4,5 +4,9 @@ LogLevel = "DEBUG"
 LogPath = "."
 
 [nhc]
-host =          "localhost"
+host =          "10.32.2.50"
 port =          8000
+
+[jeedom]
+url = "http://jeedom/core/api/jeeApi.php"
+apikey = "abcdefgh1234"

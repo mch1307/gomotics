@@ -50,8 +50,8 @@ func (sc SimpleCmd) Stringify() string {
 	return string(tmp)
 }
 
-// nhcInit sends list commands to NHC in order to get all equipments
-func nhcInit(cfg *config.NhcConf) {
+// NhcInit sends list commands to NHC in order to get all equipments
+func NhcInit(cfg *config.NhcConf) {
 	if len(cfg.Host) == 0 {
 		log.Debug("no nhc host in conf, starting discovery")
 		nhcHost := Discover()
@@ -158,7 +158,11 @@ func Route(msg *types.Message) {
 		msg.Event = "dropme"
 		_ = json.Unmarshal(msg.Data, &nhcEvent)
 		for _, rec := range nhcEvent {
-			WSPool.Broadcast <- db.ProcessNHCEvent(rec)
+			res := db.ProcessNHCEvent(rec)
+			var updatedItem types.NHCItem
+			_ = json.Unmarshal(res, &updatedItem)
+			go UpdateJeedomState(updatedItem)
+			WSPool.Broadcast <- res
 			//db.SaveItem(nhcEvent[idx])
 		}
 	} else if msg.Cmd == "systeminfo" {

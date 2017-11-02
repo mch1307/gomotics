@@ -61,7 +61,10 @@ type NHCItem struct {
 	// other value of the item
 	Value2 int `json:"value2"`
 	// other value of the item
-	Value3 int `json:"value3"`
+	Value3         int `json:"value3"`
+	JeedomID       string
+	JeedomUpdState string
+	JeedomSubType  string
 }
 
 // NHCSystemInfo hold the NHC system information
@@ -129,6 +132,68 @@ type JeedomEquipments struct {
 }
 
 type JeedomEquipment struct {
+	ID            string      `json:"id"`
+	Name          string      `json:"name"`
+	LogicalID     string      `json:"logicalId"`
+	ObjectID      string      `json:"object_id"`
+	EqTypeName    string      `json:"eqType_name"`
+	EqRealID      interface{} `json:"eqReal_id"`
+	IsVisible     string      `json:"isVisible"`
+	IsEnable      string      `json:"isEnable"`
+	Configuration struct {
+		Createtime  string `json:"createtime"`
+		Autorefresh string `json:"autorefresh"`
+		Updatetime  string `json:"updatetime"`
+	} `json:"configuration"`
+	Timeout  interface{} `json:"timeout"`
+	Category struct {
+		Heating    string `json:"heating"`
+		Security   string `json:"security"`
+		Energy     string `json:"energy"`
+		Light      string `json:"light"`
+		Automatism string `json:"automatism"`
+		Multimedia string `json:"multimedia"`
+		Default    string `json:"default"`
+	} `json:"category"`
+	Display struct {
+		ShowOncategory                 int    `json:"showOncategory"`
+		ShowObjectNameOncategory       int    `json:"showObjectNameOncategory"`
+		ShowNameOncategory             int    `json:"showNameOncategory"`
+		ShowOnstyle                    int    `json:"showOnstyle"`
+		ShowObjectNameOnstyle          int    `json:"showObjectNameOnstyle"`
+		ShowNameOnstyle                int    `json:"showNameOnstyle"`
+		ShowObjectNameOnview           int    `json:"showObjectNameOnview"`
+		ShowObjectNameOndview          int    `json:"showObjectNameOndview"`
+		ShowObjectNameOnmview          int    `json:"showObjectNameOnmview"`
+		Height                         string `json:"height"`
+		Width                          string `json:"width"`
+		LayoutDashboardTableParameters struct {
+			Center  int    `json:"center"`
+			Styletd string `json:"styletd"`
+		} `json:"layout::dashboard::table::parameters"`
+		LayoutDashboardTableCmd416Line   int `json:"layout::dashboard::table::cmd::416::line"`
+		LayoutDashboardTableCmd416Column int `json:"layout::dashboard::table::cmd::416::column"`
+		LayoutDashboardTableCmd415Line   int `json:"layout::dashboard::table::cmd::415::line"`
+		LayoutDashboardTableCmd415Column int `json:"layout::dashboard::table::cmd::415::column"`
+		LayoutDashboardTableCmd417Line   int `json:"layout::dashboard::table::cmd::417::line"`
+		LayoutDashboardTableCmd417Column int `json:"layout::dashboard::table::cmd::417::column"`
+		LayoutMobileTableParameters      struct {
+			Center  int    `json:"center"`
+			Styletd string `json:"styletd"`
+		} `json:"layout::mobile::table::parameters"`
+		LayoutMobileTableCmd416Line   int `json:"layout::mobile::table::cmd::416::line"`
+		LayoutMobileTableCmd416Column int `json:"layout::mobile::table::cmd::416::column"`
+		LayoutMobileTableCmd415Line   int `json:"layout::mobile::table::cmd::415::line"`
+		LayoutMobileTableCmd415Column int `json:"layout::mobile::table::cmd::415::column"`
+		LayoutMobileTableCmd417Line   int `json:"layout::mobile::table::cmd::417::line"`
+		LayoutMobileTableCmd417Column int `json:"layout::mobile::table::cmd::417::column"`
+	} `json:"display"`
+	Order   string      `json:"order"`
+	Comment interface{} `json:"comment"`
+	Status  string      `json:"status"`
+}
+
+/* type JeedomEquipment struct {
 	ID            string `json:"id"`
 	LogicalID     string `json:"logicalId"`
 	EqType        string `json:"eqType"`
@@ -180,7 +245,7 @@ type JeedomEquipment struct {
 	Value     string      `json:"value"`
 	IsVisible string      `json:"isVisible"`
 	Alert     interface{} `json:"alert"`
-}
+} */
 
 type JeedomCMDs struct {
 	Jsonrpc string      `json:"jsonrpc"`

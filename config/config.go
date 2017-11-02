@@ -16,11 +16,9 @@ type ServerConf struct {
 
 // JeedomConf holds the server config
 type JeedomConf struct {
-	Service string
-	Host    string
-	Port    int
-	APIPath string
-	APIKey  string
+	URL     string `toml:"url"`
+	APIKey  string `toml:"apikey"`
+	Enabled bool
 }
 
 // NhcConf holds the server config
@@ -57,6 +55,9 @@ func Initialize(cfg string) {
 	}
 	if len(Conf.ServerConfig.LogLevel) == 0 {
 		Conf.ServerConfig.LogLevel = "INFO"
+	}
+	if len(Conf.JeedomConfig.APIKey) > 0 {
+		Conf.JeedomConfig.Enabled = true
 	}
 	fmt.Printf("Starting with config: %+v", Conf.ServerConfig)
 	fmt.Println(" ")

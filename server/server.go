@@ -34,7 +34,11 @@ func (s *Server) Initialize() {
 	s.Router = mux.NewRouter().StrictSlash(true)
 	s.intializeRoutes()
 	// Initialize NHC in memory db
-	nhcInit(&config.Conf.NhcConfig)
+	NhcInit(&config.Conf.NhcConfig)
+	// Initialize Jeedom if enabled
+	if config.Conf.JeedomConfig.Enabled {
+		JeedomInit()
+	}
 }
 
 func (s *Server) intializeRoutes() {
@@ -139,6 +143,20 @@ func (s *Server) intializeRoutes() {
 	//
 	//
 	s.Router.HandleFunc("/events", ServeWebSocket).Methods("GET")
+	// swagger:route POST /jeedom/{id:[0-9]+}/{value:[0-9]+} Update NHC id with provided value. on-off -> 0-100, intermediate value for dimmer device.
+	//
+	//
+	//     Produces:
+	//     - application/json
+	//
+	//     Schemes: http, https, ws, wss
+	//
+	//
+	//     Responses:
+	//       default: genericError
+	//       200: someResponse
+	//       422: validationError
+	s.Router.HandleFunc("/api/v1/jeedom/{id:[0-9]+}/{value:[0-9]+}", JeedomCmd).Methods("GET")
 
 	s.Router.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
 		t, _ := route.GetPathTemplate()

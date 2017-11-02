@@ -3,9 +3,13 @@ package db
 import (
 	"encoding/json"
 	"strconv"
+	"strings"
+	"unicode"
 
 	"github.com/mch1307/gomotics/log"
 	"github.com/mch1307/gomotics/types"
+	"golang.org/x/text/transform"
+	"golang.org/x/text/unicode/norm"
 )
 
 var (
@@ -13,11 +17,20 @@ var (
 	nhcLocationsColl []types.Location
 	nhcItems         []types.NHCItem
 	nhcInfo          types.NHCSystemInfo
-	jeedomItems      []types.JeedomEquipment
+	jeedomEquipments []types.JeedomEquipment
 	jeedomLocations  []types.JeedomLocation
 	jeedomCMDs       []types.JeedomCMD
 	//jeedomObjects []types.JeedomObjectFull
 )
+
+// jeedomItem stores merged jeedom equipment, location and command
+type jeedomItem struct {
+	id         string
+	name       string
+	location   string
+	cmdState   string
+	cmdSubType string
+}
 
 // itemType stores the external to internal item types
 type itemType struct {
@@ -70,15 +83,15 @@ func SaveJeedomLocation(loc types.JeedomLocation) {
 func SaveJeedomItem(item types.JeedomEquipment) {
 	found := false
 	// lookup coll if record already exist
-	for idx, val := range jeedomItems {
+	for idx, val := range jeedomEquipments {
 		if val.ID == item.ID {
-			jeedomItems[idx] = item
+			jeedomEquipments[idx] = item
 			found = true
 			log.Debug("Jeedom Item ID %v found and updated", item.ID)
 		}
 	}
 	if !found {
-		jeedomItems = append(jeedomItems, item)
+		jeedomEquipments = append(jeedomEquipments, item)
 		log.Debug("Jeedom Item ID %v not found, inserted", item.ID)
 	}
 
@@ -102,7 +115,59 @@ func SaveJeedomCMD(cmd types.JeedomCMD) {
 
 }
 
-// BuildJeedomItems
+// FillNHCItems add Jeedom attributes to NHC items that could be matched
+// on name and location
+func FillNHCItems() {
+	isMn := func(r rune) bool {
+		return unicode.Is(unicode.Mn, r) // Mn: nonspacing marks
+	}
+	t := transform.Chain(norm.NFD, transform.RemoveFunc(isMn), norm.NFC)
+	// First aggregate all Jeedom related collections to a simplified one
+	// (jeeItems contains only the attributes we need)
+	var jeeItems []jeedomItem
+	var jeeItem jeedomItem
+	for _, jeeEq := range jeedomEquipments {
+		jeeItem.id = jeeEq.ID
+		jeeItem.name = jeeEq.Name
+		//log.Debug("jeedomEquipments ", jeeEq.Name)
+		for _, jeeLoc := range jeedomLocations {
+			//log.Debug("jeeLoc: ", jeeLoc.Name)
+			if jeeLoc.ID == jeeEq.ObjectID {
+				jeeItem.location = jeeLoc.Name
+			}
+		}
+		for _, jeeCMD := range jeedomCMDs {
+			//log.Debug("jeedomCMDs: ", jeeCMD.Name)
+			if jeeCMD.Name == "updState" {
+				jeeItem.cmdState = jeeCMD.ID
+				jeeItem.cmdSubType = jeeCMD.SubType
+			}
+		}
+		jeeItems = append(jeeItems, jeeItem)
+	}
+	log.Debug(jeeItems)
+	// Then matches the jeedom items to the NHC ones
+	for key, nhcItem := range nhcItems {
+		//log.Debug(nhcItem.Name)
+		for _, val := range jeeItems {
+			//log.Debug(val.name)
+			nName, _, _ := transform.String(t, nhcItem.Name)
+			nLoc, _, _ := transform.String(t, nhcItem.Location)
+			jName, _, _ := transform.String(t, val.name)
+			jLoc, _, _ := transform.String(t, val.location)
+			//log.Debug("comparing", nName, jName)
+			if strings.EqualFold(nName, jName) &&
+				strings.EqualFold(nLoc, jLoc) {
+				nhcItems[key].JeedomID = val.id
+				nhcItems[key].JeedomUpdState = val.cmdState
+				nhcItems[key].JeedomSubType = val.cmdSubType
+				log.Debug("matched name: ", nName, jName)
+				log.Debug("matched loc", nLoc, jLoc)
+			}
+		}
+	}
+	log.Debug(nhcItems)
+}
 
 // BuildNHCItems builds the collection of NHC items
 // "merges" actions and locations
@@ -118,7 +183,7 @@ func BuildNHCItems() {
 		nhcItem.State = rec.Value1
 		nhcItem.Value2 = rec.Value2
 		nhcItem.Value3 = rec.Value3
-		tmpLoc := getNHCLocation(rec.Location)
+		tmpLoc := GetNHCLocation(rec.Location)
 		nhcItem.Location = tmpLoc.Name
 		nhcItems = append(nhcItems, nhcItem)
 	}
@@ -144,8 +209,8 @@ func SaveNHCAction(act types.Action) {
 	}
 }
 
-// getNHCAction gets nhc action from collection
-func getNHCAction(id int) types.Action {
+// GetNHCAction gets nhc action from collection
+func GetNHCAction(id int) types.Action {
 	var ret types.Action
 	for idx, val := range nhcActionsColl {
 		if nhcActionsColl[idx].ID == id {
@@ -162,12 +227,26 @@ func GetNHCItems() []types.NHCItem {
 }
 
 // GetNHCItem return specific item
-func GetNHCItem(id int) (it types.NHCItem, found bool) {
+func GetNHCItem(id int) (item types.NHCItem, found bool) {
 	found = false
 	tmp := GetNHCItems()
 	var resp types.NHCItem
 	for _, val := range tmp {
 		if val.ID == id {
+			resp = val
+			found = true
+		}
+	}
+	return resp, found
+}
+
+// GetItemByJeedomID return item matching provided jeedom id
+func GetItemByJeedomID(id string) (item types.NHCItem, found bool) {
+	found = false
+	tmp := GetNHCItems()
+	var resp types.NHCItem
+	for _, val := range tmp {
+		if val.JeedomID == id {
 			resp = val
 			found = true
 		}
@@ -194,8 +273,8 @@ func SaveNHCLocation(loc types.Location) {
 	}
 }
 
-// getNHCLocation gets nhc action from collection
-func getNHCLocation(id int) types.Location {
+// GetNHCLocation gets nhc action from collection
+func GetNHCLocation(id int) types.Location {
 	var ret types.Location
 	for idx, val := range nhcLocationsColl {
 		if nhcLocationsColl[idx].ID == id {

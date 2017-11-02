@@ -8,8 +8,40 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/mch1307/gomotics/db"
+	"github.com/mch1307/gomotics/log"
 	"github.com/mch1307/gomotics/types"
 )
+
+// JeedomCmd handler for POST on /jeedom/{id}/{value}
+func JeedomCmd(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	nhcItem, found := db.GetItemByJeedomID(vars["id"])
+	if !found {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		w.Write([]byte("Item not found"))
+		log.Warn("Item not found ", vars)
+		return
+	}
+	val, err := strconv.Atoi(vars["value"])
+	if err != nil {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		w.Write([]byte("Invalid value"))
+		log.Warn("Invalid value ", vars)
+		return
+	}
+	myCmd := new(SimpleCmd)
+	myCmd.Cmd = "executeactions"
+	myCmd.ID = nhcItem.ID
+	myCmd.Value = val
+	if err := SendCommand(myCmd.Stringify()); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintln(w, err)
+	} else {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("Success"))
+	}
+
+}
 
 // NhcCmd endpoints for sending NHC commands
 func NhcCmd(w http.ResponseWriter, r *http.Request) {
@@ -60,7 +92,6 @@ func GetNhcItem(w http.ResponseWriter, r *http.Request) {
 	found := false
 	params := mux.Vars(r)
 	tmp := db.GetNHCItems()
-	//fmt.Println("getnhcItem arg: ", params["id"])
 	var resp types.NHCItem
 	for _, val := range tmp {
 		if i, _ := strconv.Atoi(params["id"]); val.ID == i {
