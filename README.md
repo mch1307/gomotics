@@ -22,13 +22,12 @@ More information/doc on https://blog.csnet.me/gomotics/
 
 A docker image is automatically build with Travis-CI. It is available on [Docker Hub](https://hub.docker.com/r/mch1307/gomotics/)
 
-> docker run -d -P --net host --name gomotics mch1307/gomotics
-
 ### Binaries
 
 Download your platform binary from the release page, extract the executable from the archive. 
 
 ## Running
+### Config file
 gomotics will run with default config if you do not provide a configuration file. If you want to link gomotics with Jeedom, provide the Jeedom URL and API key as follows
 
 ```
@@ -53,7 +52,23 @@ host =          "x.x.x.x"
 port =          8000
 
 ```
+### env variables
 
+Config can also be setup as env variable:
+
+```
+LISTEN_PORT     optional    default 8081
+LOG_LEVEL       optional    default INFO
+LOG_PATH        optional    default . (working dir)
+JEE_URL         mandatory for Jeedom
+JEE_APIKEY      mandatory for Jeedom
+NHC_HOST        optional    autodiscover
+NHC_PORT        optional    autodiscover on port 8000
+```
 Then start gomotics as follows:
 
 > gomotics -conf path/confg.toml
+
+Or if using docker:
+
+> docker run -d -P --net host --name gomotics --JEE_URL=http://jeedom-host/core/api/jeeApi.php --JEE_APIKEY=abcdegf1234 mch1307/gomotics

@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/BurntSushi/toml"
 )
@@ -38,27 +39,43 @@ type GlobalConfig struct {
 // Conf holds the global configuration
 var Conf GlobalConfig
 
+func coalesce(str ...string) string {
+	for _, val := range str {
+		if val != "" {
+			return val
+		}
+	}
+	return ""
+}
+
 // Initialize populates the Conf variable
 func Initialize(cfg string) {
 	Conf.JeedomConfig.Enabled = false
-	if _, err := os.Stat(cfg); err != nil {
-		//fmt.Println("Invalid config file/path: ", err)
-		wrkDir, _ := os.Getwd()
-		Conf.ServerConfig.LogPath = wrkDir
-	} else {
-		if _, err := toml.DecodeFile(cfg, &Conf); err != nil {
-			fmt.Println("Error parsing config file: ", err)
+	// load config file if any
+	if cfg != "" {
+		if _, err := os.Stat(cfg); err != nil {
+			wrkDir, _ := os.Getwd()
+			Conf.ServerConfig.LogPath = wrkDir
+		} else {
+			if _, err := toml.DecodeFile(cfg, &Conf); err != nil {
+				fmt.Println("Error parsing config file: ", err)
+			}
 		}
 	}
-	if Conf.ServerConfig.ListenPort == 0 {
-		Conf.ServerConfig.ListenPort = 8081
-	}
-	if len(Conf.ServerConfig.LogLevel) == 0 {
-		Conf.ServerConfig.LogLevel = "INFO"
-	}
+	wrkDir, _ := os.Getwd()
+	listenPort, _ := strconv.Atoi(coalesce(os.Getenv("LISTEN_PORT"), strconv.Itoa(Conf.ServerConfig.ListenPort), "8081"))
+	Conf.ServerConfig.ListenPort = listenPort
+	Conf.ServerConfig.LogLevel = coalesce(os.Getenv("LOG_LEVEL"), Conf.ServerConfig.LogLevel, "INFO")
+	Conf.ServerConfig.LogPath = coalesce(os.Getenv("LOG_PATH"), Conf.ServerConfig.LogPath, wrkDir)
+	Conf.JeedomConfig.URL = coalesce(os.Getenv("JEE_URL"), Conf.JeedomConfig.URL)
+	Conf.JeedomConfig.APIKey = coalesce(os.Getenv("JEE_APIKEY"), Conf.JeedomConfig.APIKey)
+	Conf.NhcConfig.Host = coalesce(os.Getenv("NHC_HOST"), Conf.NhcConfig.Host)
+	nhcPort, _ := strconv.Atoi(coalesce(os.Getenv("NHC_PORT"), strconv.Itoa(Conf.NhcConfig.Port), "8000"))
+	Conf.NhcConfig.Port = nhcPort
+
 	if len(Conf.JeedomConfig.APIKey) > 0 {
 		Conf.JeedomConfig.Enabled = true
 	}
-	fmt.Printf("Starting with config: %+v", Conf.ServerConfig)
+	fmt.Printf("Starting with config: %+v", Conf)
 	fmt.Println(" ")
 }
