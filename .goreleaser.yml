@@ -10,6 +10,7 @@ builds:
     goarch:
       - amd64
       - arm64
+      - 386
 # Archive customization
 archive:
   format: tar.gz
