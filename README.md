@@ -59,7 +59,7 @@ Config can also be setup as env variable:
 ```
 LISTEN_PORT     optional    default 8081
 LOG_LEVEL       optional    default INFO
-LOG_PATH        optional    default . (working dir)
+LOG_PATH        optional    default . (specify stdout for docker)
 JEE_URL         mandatory for Jeedom
 JEE_APIKEY      mandatory for Jeedom
 NHC_HOST        optional    autodiscover
@@ -71,4 +71,4 @@ Then start gomotics as follows:
 
 Or if using docker:
 
-> docker run -d -P --net host --name gomotics --JEE_URL=http://jeedom-host/core/api/jeeApi.php --JEE_APIKEY=abcdegf1234 mch1307/gomotics
+> docker run -d -P --net host --name gomotics -e JEE_URL=http://jeedom-host/core/api/jeeApi.php -e JEE_APIKEY=abcdegf1234 -e LOG_PATH=stdout mch1307/gomotics

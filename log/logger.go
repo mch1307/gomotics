@@ -38,7 +38,11 @@ func Init() {
 	if err != nil {
 		panic(err)
 	}
-	log.SetOutput(file)
+	if config.Conf.ServerConfig.LogPath == "stdout" {
+		log.SetOutput(os.Stdout)
+	} else {
+		log.SetOutput(file)
+	}
 	log.Info("logger initialized")
 }
 
