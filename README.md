@@ -40,18 +40,18 @@ A complete config file would like as follows:
 
 ``` 
 [server]
-[server]
 ListenPort = 8081
 LogLevel = "DEBUG"
 LogPath = "."
+
+[jeedom]
+url = "http://jeedom-host/core/api/jeeApi.php"
+apikey = "abcdefgh1234"
 
 [nhc]
 host =          "x.x.x.x"
 port =          8000
 
-[jeedom]
-url = "http://jeedom-host/core/api/jeeApi.php"
-apikey = "abcdefgh1234"
 ```
 
 Then start gomotics as follows:
