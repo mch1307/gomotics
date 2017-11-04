@@ -26,6 +26,8 @@ A docker image is automatically build with Travis-CI. It is available on [Docker
 
 Download your platform binary from the release page, extract the executable from the archive. 
 
+See the [wiki](https://github.com/mch1307/gomotics/wiki) for an example of automating gomotics process startup with [supervisor](http://supervisord.org/)
+
 ## Running
 ### Config file
 gomotics will run with default config if you do not provide a configuration file. If you want to link gomotics with Jeedom, provide the Jeedom URL and API key as follows
