@@ -1,6 +1,7 @@
 package log
 
 import (
+	"fmt"
 	"os"
 	"path"
 	"path/filepath"
@@ -27,20 +28,18 @@ type callInfo struct {
 func Init() {
 
 	log.SetFormatter(&log.JSONFormatter{})
-
-	var err error
 	logLevel, _ := log.ParseLevel(config.Conf.ServerConfig.LogLevel)
-
 	log.SetLevel(logLevel)
-	logFilePath := filepath.Join(config.Conf.ServerConfig.LogPath, "gomotics.log")
-	file, err := os.OpenFile(logFilePath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 
-	if err != nil {
-		panic(err)
-	}
 	if config.Conf.ServerConfig.LogPath == "stdout" {
+		fmt.Println("logging to stdout")
 		log.SetOutput(os.Stdout)
 	} else {
+		logFilePath := filepath.Join(config.Conf.ServerConfig.LogPath, "gomotics.log")
+		file, err := os.OpenFile(logFilePath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+		if err != nil {
+			panic(err)
+		}
 		log.SetOutput(file)
 	}
 	log.Info("logger initialized")
