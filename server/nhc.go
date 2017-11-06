@@ -161,7 +161,9 @@ func Route(msg *types.Message) {
 			res := db.ProcessNHCEvent(rec)
 			var updatedItem types.NHCItem
 			_ = json.Unmarshal(res, &updatedItem)
-			go UpdateJeedomState(updatedItem)
+			if config.Conf.JeedomConfig.Enabled {
+				go UpdateJeedomState(updatedItem)
+			}
 			WSPool.Broadcast <- res
 			//db.SaveItem(nhcEvent[idx])
 		}
