@@ -97,7 +97,7 @@ func SaveJeedomItem(item types.JeedomEquipment) {
 
 }
 
-// SaveJeedomCmd save Jeedom equipment to collection
+// SaveJeedomCMD save Jeedom equipment to collection
 func SaveJeedomCMD(cmd types.JeedomCMD) {
 	found := false
 	// lookup coll if record already exist
@@ -125,8 +125,9 @@ func FillNHCItems() {
 	// First aggregate all Jeedom related collections to a simplified one
 	// (jeeItems contains only the attributes we need)
 	var jeeItems []jeedomItem
-	var jeeItem jeedomItem
 	for _, jeeEq := range jeedomEquipments {
+		var jeeItem jeedomItem
+		//jeeItem = new(jeedomItem)
 		jeeItem.id = jeeEq.ID
 		jeeItem.name = jeeEq.Name
 		//log.Debug("jeedomEquipments ", jeeEq.Name)
@@ -138,7 +139,7 @@ func FillNHCItems() {
 		}
 		for _, jeeCMD := range jeedomCMDs {
 			//log.Debug("jeedomCMDs: ", jeeCMD.Name)
-			if jeeCMD.Name == "updState" {
+			if jeeCMD.Name == "updState" && jeeCMD.EqLogicID == jeeItem.id {
 				jeeItem.cmdState = jeeCMD.ID
 				jeeItem.cmdSubType = jeeCMD.SubType
 			}
@@ -169,9 +170,15 @@ func FillNHCItems() {
 	log.Debug(nhcItems)
 }
 
+func makeNHCItems() []types.NHCItem {
+	var coll []types.NHCItem
+	return coll
+}
+
 // BuildNHCItems builds the collection of NHC items
 // "merges" actions and locations
 func BuildNHCItems() {
+	nhcItems = makeNHCItems()
 	var nhcItem types.NHCItem
 	// loop through NHC raw actions collection
 	// and build items collection
