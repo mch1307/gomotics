@@ -23,7 +23,7 @@ func TestInitialize(t *testing.T) {
 	cfg.JeedomConfig.APIKey = ""
 	cfg.JeedomConfig.Enabled = false
 	cfgDefault.NhcConfig.Host = ""
-	cfgDefault.NhcConfig.Port = 0
+	cfgDefault.NhcConfig.Port = 8000
 	cfgDefault.ServerConfig.ListenPort = 8081
 	cfgDefault.ServerConfig.LogLevel = "INFO"
 	cfgDefault.ServerConfig.LogPath, _ = os.Getwd()
