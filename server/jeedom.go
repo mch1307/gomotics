@@ -46,7 +46,7 @@ func UpdateJeedomState(item types.NHCItem) error {
 	qry := req.URL.Query()
 	qry.Add("apikey", config.Conf.JeedomConfig.APIKey)
 	qry.Add("type", "cmd")
-	qry.Add("id", item.JeedomID)
+	qry.Add("id", item.JeedomUpdState)
 	qry.Add(item.JeedomSubType, strconv.Itoa(item.State))
 	req.URL.RawQuery = qry.Encode()
 	log.Debug("jeedom upd url: ", req.URL.String())
