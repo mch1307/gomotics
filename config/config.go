@@ -39,10 +39,20 @@ type GlobalConfig struct {
 // Conf holds the global configuration
 var Conf GlobalConfig
 
-func coalesce(str ...string) string {
-	for _, val := range str {
-		if val != "" {
-			return val
+// coalesce returns the first non nil/zero passed value as string
+// numeric 0 value considered as empty
+func coalesce(data ...interface{}) string {
+	for _, v := range data {
+		switch v := v.(type) {
+		case string:
+			if len(v) > 0 {
+				return v
+			}
+		case int:
+			if v > 0 {
+				strconv.Itoa(v)
+				return strconv.Itoa(v)
+			}
 		}
 	}
 	return ""
@@ -63,14 +73,14 @@ func Initialize(cfg string) {
 		}
 	}
 	wrkDir, _ := os.Getwd()
-	listenPort, _ := strconv.Atoi(coalesce(os.Getenv("LISTEN_PORT"), strconv.Itoa(Conf.ServerConfig.ListenPort), "8081"))
+	listenPort, _ := strconv.Atoi(coalesce(os.Getenv("LISTEN_PORT"), Conf.ServerConfig.ListenPort, "8081"))
 	Conf.ServerConfig.ListenPort = listenPort
 	Conf.ServerConfig.LogLevel = coalesce(os.Getenv("LOG_LEVEL"), Conf.ServerConfig.LogLevel, "INFO")
 	Conf.ServerConfig.LogPath = coalesce(os.Getenv("LOG_PATH"), Conf.ServerConfig.LogPath, wrkDir)
 	Conf.JeedomConfig.URL = coalesce(os.Getenv("JEE_URL"), Conf.JeedomConfig.URL)
 	Conf.JeedomConfig.APIKey = coalesce(os.Getenv("JEE_APIKEY"), Conf.JeedomConfig.APIKey)
 	Conf.NhcConfig.Host = coalesce(os.Getenv("NHC_HOST"), Conf.NhcConfig.Host)
-	nhcPort, _ := strconv.Atoi(coalesce(os.Getenv("NHC_PORT"), strconv.Itoa(Conf.NhcConfig.Port), "8000"))
+	nhcPort, _ := strconv.Atoi(coalesce(os.Getenv("NHC_PORT"), Conf.NhcConfig.Port, "8000"))
 	Conf.NhcConfig.Port = nhcPort
 
 	if len(Conf.JeedomConfig.APIKey) > 0 {
