@@ -3,7 +3,6 @@ package server
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -15,11 +14,7 @@ import (
 	"github.com/mch1307/gomotics/types"
 )
 
-//const jeeUrl = "http://jeedom.csnet.me/core/api/jeeApi.php"
-
 var args types.JsonRpcArgs
-
-//TODO: feels like repeating code in the Getxx ..
 
 // JeedomInit Initialize jeedom internal "db"
 func JeedomInit() {
@@ -58,6 +53,7 @@ func UpdateJeedomState(item types.NHCItem) error {
 	return err
 }
 
+// makeRPCArgs returns prepared Jeedom RPC basic args
 func makeRPCArgs() types.JsonRpcArgs {
 	var args types.JsonRpcArgs
 	args.Jsonrpc = "2.0"
@@ -67,6 +63,7 @@ func makeRPCArgs() types.JsonRpcArgs {
 	return args
 }
 
+// newJeedomRPCRequest returns a pre-configure http request
 func newJeedomRPCRequest(args []byte) *http.Request {
 	req, err := http.NewRequest(http.MethodPut, config.Conf.JeedomConfig.URL, bytes.NewBuffer(args))
 	if err != nil {
@@ -78,25 +75,34 @@ func newJeedomRPCRequest(args []byte) *http.Request {
 	return req
 }
 
-// GetJeedomObjects gets all objects (full) from Jeedom
-func GetJeedomObjects() []types.JeedomLocation {
-	var jeedomObjects types.JeedomObjects
-	var ret []types.JeedomLocation
+// JeedomRPCRequest send JSON RPC request to Jeedom, returns raw result
+func JeedomRPCRequest(args *types.JsonRpcArgs) (res []byte, err error) {
 	hcli := http.Client{Timeout: time.Second * 2}
-	args := makeRPCArgs()
-	args.Method = "object::all"
-
 	parsedArgs, err := json.Marshal(args)
 	if err != nil {
-		fmt.Println(err)
+		log.Warn(err)
 	}
 	req := newJeedomRPCRequest(parsedArgs)
 	resp, err := hcli.Do(req)
 	if err != nil {
-		panic(err)
+		log.Warn(err)
 	}
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
+	return body, err
+}
+
+// GetJeedomObjects gets all objects from Jeedom
+func GetJeedomObjects() []types.JeedomLocation {
+	var jeedomObjects types.JeedomObjects
+	var ret []types.JeedomLocation
+	args := makeRPCArgs()
+	args.Method = "object::all"
+
+	body, err := JeedomRPCRequest(&args)
+	if err != nil {
+		log.Warn(err)
+	}
 	_ = json.Unmarshal(body, &jeedomObjects)
 
 	for _, val := range jeedomObjects.Result {
@@ -111,15 +117,11 @@ func GetJeedomEquipments() []types.JeedomEquipment {
 	args := makeRPCArgs()
 	args.Method = "eqLogic::byType"
 	args.Params.Type = "script"
-	hcli := http.Client{Timeout: time.Second * 2}
-	parsedArgs, _ := json.Marshal(args)
-	req := newJeedomRPCRequest(parsedArgs)
-	resp, err := hcli.Do(req)
+
+	body, err := JeedomRPCRequest(&args)
 	if err != nil {
-		panic(err)
+		log.Warn(err)
 	}
-	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
 
 	_ = json.Unmarshal(body, &jeedomEquipments)
 	for _, val := range jeedomEquipments.Result {
@@ -128,6 +130,7 @@ func GetJeedomEquipments() []types.JeedomEquipment {
 	return ret
 }
 
+// GetJeedomCMDs returns the list of cmds of a given equipment
 func GetJeedomCMDs(id string) []types.JeedomCMD {
 	log.Debug("received id: ", id)
 	var jeedomCMDs types.JeedomCMDs
@@ -135,15 +138,12 @@ func GetJeedomCMDs(id string) []types.JeedomCMD {
 	args := makeRPCArgs()
 	args.Method = "cmd::byEqLogicId"
 	args.Params.EqLogicID = id
-	parsedArgs, _ := json.Marshal(args)
-	req := newJeedomRPCRequest(parsedArgs)
-	hcli := http.Client{Timeout: time.Second * 2}
-	resp, err := hcli.Do(req)
+
+	body, err := JeedomRPCRequest(&args)
 	if err != nil {
-		panic(err)
+		log.Warn(err)
 	}
-	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
+
 	_ = json.Unmarshal(body, &jeedomCMDs)
 	for _, val := range jeedomCMDs.Result {
 		ret = append(ret, val)
