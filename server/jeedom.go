@@ -18,19 +18,30 @@ var args types.JsonRpcArgs
 
 // JeedomInit Initialize jeedom internal "db"
 func JeedomInit() {
-	locs := GetJeedomObjects()
-	for _, val := range locs {
-		db.SaveJeedomLocation(val)
+	scriptOK, err := isJeedomPluginInstalled("script")
+	if err != nil {
+		log.Warn("Unable to acces Jeedom: ", err)
+		config.Conf.JeedomConfig.Enabled = false
+		return
 	}
-	eqs := GetJeedomEquipments()
-	for _, eq := range eqs {
-		db.SaveJeedomItem(eq)
-		cmds := GetJeedomCMDs(eq.ID)
-		for _, cmd := range cmds {
-			db.SaveJeedomCMD(cmd)
+	if scriptOK {
+		locs := GetJeedomObjects()
+		for _, val := range locs {
+			db.SaveJeedomLocation(val)
 		}
+		eqs := GetJeedomEquipments()
+		for _, eq := range eqs {
+			db.SaveJeedomItem(eq)
+			cmds := GetJeedomCMDs(eq.ID)
+			for _, cmd := range cmds {
+				db.SaveJeedomCMD(cmd)
+			}
+		}
+		db.FillNHCItems()
+	} else {
+		log.Warn("Script Plugin is not installed, disabling Jeedom")
+		config.Conf.JeedomConfig.Enabled = false
 	}
-	db.FillNHCItems()
 }
 
 // UpdateJeedomState updates the device's status in Jeedom
@@ -90,6 +101,27 @@ func JeedomRPCRequest(args *types.JsonRpcArgs) (res []byte, err error) {
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
 	return body, err
+}
+
+// isJeedomPluginInstalled checks if script plugin is installed
+func isJeedomPluginInstalled(p string) (bool, error) {
+	var jeedomPlugins types.JeedomPlugins
+	var res bool
+	args := makeRPCArgs()
+	args.Method = "plugin::listPlugin"
+
+	body, err := JeedomRPCRequest(&args)
+	if err != nil {
+		log.Warn(err)
+	}
+	_ = json.Unmarshal(body, &jeedomPlugins)
+	for _, v := range jeedomPlugins.Result {
+		if v.Name == "script" {
+			res = true
+		}
+	}
+	return res, err
+
 }
 
 // GetJeedomObjects gets all objects from Jeedom

@@ -344,3 +344,47 @@ type JeedomCMD struct {
 	GenericType  string      `json:"generic_type"`
 	CurrentValue int         `json:"currentValue"`
 }
+
+type JeedomPlugins struct {
+	Jsonrpc string `json:"jsonrpc"`
+	ID      string `json:"id"`
+	Result  []struct {
+		ID                       string `json:"id"`
+		Name                     string `json:"name"`
+		Description              string `json:"description"`
+		Licence                  string `json:"licence"`
+		Installation             string `json:"installation"`
+		Author                   string `json:"author"`
+		Require                  string `json:"require"`
+		Category                 string `json:"category"`
+		Filepath                 string `json:"filepath"`
+		Index                    string `json:"index"`
+		Display                  string `json:"display"`
+		Mobile                   string `json:"mobile"`
+		Eventjs                  int    `json:"eventjs"`
+		HasDependency            int    `json:"hasDependency"`
+		MaxDependancyInstallTime int    `json:"maxDependancyInstallTime"`
+		HasOwnDeamon             int    `json:"hasOwnDeamon"`
+		Issue                    string `json:"issue"`
+		Changelog                string `json:"changelog"`
+		Documentation            string `json:"documentation"`
+		Info                     struct {
+			Doc       string `json:"doc"`
+			Changelog string `json:"changelog"`
+			Display   string `json:"display"`
+		} `json:"info"`
+		Include struct {
+			File string `json:"file"`
+			Type string `json:"type"`
+		} `json:"include"`
+		Functionality struct {
+			Interact   bool `json:"interact"`
+			Cron       bool `json:"cron"`
+			Cron5      bool `json:"cron5"`
+			Cron15     bool `json:"cron15"`
+			Cron30     bool `json:"cron30"`
+			CronHourly bool `json:"cronHourly"`
+			CronDaily  bool `json:"cronDaily"`
+		} `json:"functionality"`
+	} `json:"result"`
+}
