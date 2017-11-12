@@ -12,9 +12,9 @@ import (
 	"github.com/mch1307/gomotics/config"
 )
 
-var (
+/* var (
 	globalConf config.GlobalConfig
-)
+) */
 
 type callInfo struct {
 	packageName string
