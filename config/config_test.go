@@ -22,6 +22,8 @@ func TestInitialize(t *testing.T) {
 	cfg.JeedomConfig.URL = "http://jeedom/core/api/jeeApi.php"
 	cfg.JeedomConfig.APIKey = ""
 	cfg.JeedomConfig.Enabled = false
+	cfg.JeedomConfig.CreateNHCObjects = false
+	cfg.ServerConfig.EndpointURL = "localhost"
 	cfgDefault.NhcConfig.Host = ""
 	cfgDefault.NhcConfig.Port = 8000
 	cfgDefault.ServerConfig.ListenPort = 8081
@@ -30,6 +32,8 @@ func TestInitialize(t *testing.T) {
 	cfgDefault.JeedomConfig.URL = ""
 	cfgDefault.JeedomConfig.APIKey = ""
 	cfgDefault.JeedomConfig.Enabled = false
+	cfgDefault.JeedomConfig.CreateNHCObjects = false
+	cfgDefault.ServerConfig.EndpointURL = "localhost"
 	tests := []struct {
 		name     string
 		confFile string
