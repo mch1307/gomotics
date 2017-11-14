@@ -22,6 +22,8 @@ func JeedomCmd(w http.ResponseWriter, r *http.Request) {
 		log.Warn("Item not found ", vars)
 		return
 	}
+	nhcItem.JeedomState = vars["value"]
+	db.SaveNHCItem(nhcItem)
 	val, err := strconv.Atoi(vars["value"])
 	if err != nil {
 		w.WriteHeader(http.StatusMethodNotAllowed)
