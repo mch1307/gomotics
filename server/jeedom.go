@@ -260,7 +260,7 @@ func ExecJeedomRPCRequest(args *types.JsonRpcArgs) (res []byte, err error) {
 	if err != nil {
 		log.Warn(err)
 	}
-	log.DebugF("sent command %v %v", args.Method, args.Params)
+	log.Debug("sent command: ", args.Method, args.Params)
 	req := newJeedomRPCRequest(parsedArgs)
 
 	resp, err := hcli.Do(req)
