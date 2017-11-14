@@ -12,10 +12,6 @@ import (
 	"github.com/mch1307/gomotics/config"
 )
 
-/* var (
-	globalConf config.GlobalConfig
-) */
-
 type callInfo struct {
 	packageName string
 	fileName    string

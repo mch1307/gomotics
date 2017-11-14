@@ -11,18 +11,18 @@ import (
 
 // ServerConf holds the server config
 type ServerConf struct {
-	ListenPort  int    `toml:"ListenPort"`
-	LogLevel    string `toml:"LogLevel"`
-	LogPath     string `toml:"LogPath"`
-	EndpointURL string `toml:"EndpointURL"`
+	ListenPort int    `toml:"listenPort"`
+	LogLevel   string `toml:"logLevel"`
+	LogPath    string `toml:"logPath"`
+	GMHostPort string `toml:"gmHostPort"`
 }
 
 // JeedomConf holds the server config
 type JeedomConf struct {
-	URL              string `toml:"url"`
-	APIKey           string `toml:"apikey"`
-	Enabled          bool
-	CreateNHCObjects bool `toml:"AutoCreateNHCObjects"`
+	URL               string `toml:"url"`
+	APIKey            string `toml:"apikey"`
+	Enabled           bool
+	AutoCreateObjects bool `toml:"autoCreateObjects"`
 }
 
 // NhcConf holds the server config
@@ -83,14 +83,14 @@ func Initialize(cfg string) {
 	Conf.JeedomConfig.URL = coalesce(os.Getenv("JEE_URL"), Conf.JeedomConfig.URL)
 	Conf.JeedomConfig.APIKey = coalesce(os.Getenv("JEE_APIKEY"), Conf.JeedomConfig.APIKey)
 	Conf.NhcConfig.Host = coalesce(os.Getenv("NHC_HOST"), Conf.NhcConfig.Host)
-	Conf.ServerConfig.EndpointURL = coalesce(os.Getenv("ENDPOINT_URL"), Conf.ServerConfig.EndpointURL, "localhost")
+	Conf.ServerConfig.GMHostPort = coalesce(os.Getenv("GM_HOSTPORT"), Conf.ServerConfig.GMHostPort, "localhost")
 	var co = "N"
-	if Conf.JeedomConfig.CreateNHCObjects {
+	if Conf.JeedomConfig.AutoCreateObjects {
 		co = "Y"
 	}
-	co = coalesce(os.Getenv("CREATE_NHCOBJECTS"), co, "N")
+	co = coalesce(os.Getenv("AUTO_CREATE_OBJECTS"), co, "N")
 	if strings.ToUpper(co) == "Y" {
-		Conf.JeedomConfig.CreateNHCObjects = true
+		Conf.JeedomConfig.AutoCreateObjects = true
 	}
 
 	nhcPort, _ := strconv.Atoi(coalesce(os.Getenv("NHC_PORT"), Conf.NhcConfig.Port, "8000"))

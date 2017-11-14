@@ -1,8 +1,9 @@
 [server]
-ListenPort = 8081
-LogLevel = "DEBUG"
-LogPath = "."
-EndpointURL = "localhost"
+listenPort = 8081
+logLevel = "DEBUG"
+logPath = "."
+gmHostPort = "localhost:8081"
+
 
 [nhc]
 host =          "localhost"
@@ -11,4 +12,4 @@ port =          8000
 [jeedom]
 url = "http://jeedom/core/api/jeeApi.php"
 apikey = ""
-AutoCreateNHCObjects = false
+autoCreateObjects = false

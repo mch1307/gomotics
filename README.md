@@ -24,7 +24,7 @@ A docker image is automatically build with Travis-CI. It is available on [Docker
 
 ### Binaries
 
-Download your platform binary from the release page, extract the executable from the archive. 
+Download your platform binary from the [release page](https://github.com/mch1307/gomotics/releases), extract the executable from the archive. 
 
 See the [wiki](https://github.com/mch1307/gomotics/wiki) for an example of automating gomotics process startup with [supervisor](http://supervisord.org/)
 
@@ -37,17 +37,31 @@ gomotics will run with default config if you do not provide a configuration file
 url = "http://jeedom/core/api/jeeApi.php"
 apikey = "abcdefgh1234"
 ```
+
+To enable Gomotics to automatically create NHC items in Jeedom:
+```
+[jeedom]
+url = "http://jeedom/core/api/jeeApi.php"
+apikey = "abcdefgh1234"
+autoCreateObjects= true
+
+[server]
+gmHostPort = "gomotics.local:8081"
+```
+
 A complete config file would like as follows:
 
 ``` 
 [server]
-ListenPort = 8081
-LogLevel = "DEBUG"
-LogPath = "."
+listenPort = 8081
+logLevel = "DEBUG"
+logPath = "."
+gmHostPort = "gomotics.local:8081"
 
 [jeedom]
 url = "http://jeedom-host/core/api/jeeApi.php"
 apikey = "abcdefgh1234"
+autoCreateObjects= false
 
 [nhc]
 host =          "x.x.x.x"
@@ -59,13 +73,15 @@ port =          8000
 Config can also be setup as env variable:
 
 ```
-LISTEN_PORT     optional    default 8081
-LOG_LEVEL       optional    default INFO
-LOG_PATH        optional    default . (specify stdout for docker)
-JEE_URL         mandatory for Jeedom
-JEE_APIKEY      mandatory for Jeedom
-NHC_HOST        optional    autodiscover
-NHC_PORT        optional    autodiscover on port 8000
+LISTEN_PORT         optional    default 8081
+LOG_LEVEL           optional    default INFO
+LOG_PATH            optional    default . (specify stdout for docker)
+JEE_URL             mandatory if using Jeedom
+JEE_APIKEY          mandatory if using Jeedom
+NHC_HOST            optional    autodiscover
+NHC_PORT            optional    autodiscover on port 8000
+AUTO_CREATE_OBJECTS optional    default false
+GM_HOSTPORT         mandatory if using AutoCreateObjects feature, default localhost
 ```
 Then start gomotics as follows:
 

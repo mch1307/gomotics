@@ -20,6 +20,7 @@ var (
 	jeedomEquipments []types.JeedomEquipment
 	jeedomLocations  []types.JeedomLocation
 	jeedomCMDs       []types.JeedomCMD
+	jeedomItems      jeedomItemsColl
 	//jeedomObjects []types.JeedomObjectFull
 )
 
@@ -27,10 +28,13 @@ var (
 type jeedomItem struct {
 	id         string
 	name       string
+	locationID string
 	location   string
 	cmdState   string
 	cmdSubType string
 }
+
+type jeedomItemsColl []jeedomItem
 
 // itemType stores the external to internal item types
 type itemType struct {
@@ -58,6 +62,44 @@ func GetInternalType(provider, pType string) (internalType string) {
 		}
 	}
 	return ""
+}
+
+// GetMissingJeedomObjects returns the list of NHC locations not found in Jeedom
+func GetMissingJeedomObjects() []string {
+	var res []string
+	for _, nhcLoc := range nhcLocationsColl {
+		found := false
+		nhcName, _, _ := transform.String(t, nhcLoc.Name)
+		for _, jeedomLoc := range jeedomLocations {
+			jeedomName, _, _ := transform.String(t, jeedomLoc.Name)
+			if jeedomName == nhcName {
+				found = true
+			}
+		}
+		if !found && nhcName != "" { // remove the special "" NHC location
+			res = append(res, nhcName)
+		}
+	}
+	return res
+}
+
+// GetMissingJeedomEquipment returns missing
+func GetMissingJeedomEquipment() []types.NHCItem {
+	var res []types.NHCItem
+	for _, nhcItem := range nhcItems {
+		found := false
+		nhcName, _, _ := transform.String(t, nhcItem.Name)
+		for _, jeedomEquipment := range jeedomItems {
+			jeedomName, _, _ := transform.String(t, jeedomEquipment.name)
+			if jeedomName == nhcName {
+				found = true
+			}
+		}
+		if !found {
+			res = append(res, nhcItem)
+		}
+	}
+	return res
 }
 
 // SaveJeedomLocation save Jeedom object (location) to collection
@@ -115,16 +157,19 @@ func SaveJeedomCMD(cmd types.JeedomCMD) {
 
 }
 
+func isMn(r rune) bool {
+	return unicode.Is(unicode.Mn, r) // Mn: nonspacing marks
+}
+
+var t = transform.Chain(norm.NFD, transform.RemoveFunc(isMn), norm.NFC)
+
 // FillNHCItems add Jeedom attributes to NHC items that could be matched
 // on name and location
 func FillNHCItems() {
-	isMn := func(r rune) bool {
-		return unicode.Is(unicode.Mn, r) // Mn: nonspacing marks
-	}
-	t := transform.Chain(norm.NFD, transform.RemoveFunc(isMn), norm.NFC)
 	// First aggregate all Jeedom related collections to a simplified one
 	// (jeeItems contains only the attributes we need)
-	var jeeItems []jeedomItem
+	//var jeeItems []jeedomItem
+	jeedomItems = makeJeedomItems()
 	for _, jeeEq := range jeedomEquipments {
 		var jeeItem jeedomItem
 		//jeeItem = new(jeedomItem)
@@ -135,6 +180,7 @@ func FillNHCItems() {
 			//log.Debug("jeeLoc: ", jeeLoc.Name)
 			if jeeLoc.ID == jeeEq.ObjectID {
 				jeeItem.location = jeeLoc.Name
+				jeeItem.locationID = jeeLoc.ID
 			}
 		}
 		for _, jeeCMD := range jeedomCMDs {
@@ -144,13 +190,13 @@ func FillNHCItems() {
 				jeeItem.cmdSubType = jeeCMD.SubType
 			}
 		}
-		jeeItems = append(jeeItems, jeeItem)
+		jeedomItems = append(jeedomItems, jeeItem)
 	}
-	log.Debug(jeeItems)
-	// Then matches the jeedom items to the NHC ones
+	log.Debug(jeedomItems)
+	// Then matches the NHC items to the Jeedom ones
 	for key, nhcItem := range nhcItems {
 		//log.Debug(nhcItem.Name)
-		for _, val := range jeeItems {
+		for _, val := range jeedomItems {
 			//log.Debug(val.name)
 			nName, _, _ := transform.String(t, nhcItem.Name)
 			nLoc, _, _ := transform.String(t, nhcItem.Location)
@@ -172,6 +218,11 @@ func FillNHCItems() {
 
 func makeNHCItems() []types.NHCItem {
 	var coll []types.NHCItem
+	return coll
+}
+
+func makeJeedomItems() jeedomItemsColl {
+	var coll jeedomItemsColl
 	return coll
 }
 
@@ -213,6 +264,15 @@ func SaveNHCAction(act types.Action) {
 	if !found {
 		log.Debugf("Nhc ID %v not found -> inserted", act.ID)
 		nhcActionsColl = append(nhcActionsColl, act)
+	}
+}
+
+// SaveNHCItem update NHC items collection
+func SaveNHCItem(item types.NHCItem) {
+	for k, v := range nhcItems {
+		if v.ID == item.ID {
+			nhcItems[k].JeedomState = item.JeedomState
+		}
 	}
 }
 
@@ -331,4 +391,15 @@ func SaveNhcSysInfo(nhcSysInfo types.NHCSystemInfo) {
 // GetNhcSysInfo returns the NHC system information
 func GetNhcSysInfo() (nhcSysInfo types.NHCSystemInfo) {
 	return nhcInfo
+}
+
+func GetJeedomLocationID(name string) string {
+	argName, _, _ := transform.String(t, name)
+	for _, jeeLoc := range jeedomLocations {
+		jeeName, _, _ := transform.String(t, jeeLoc.Name)
+		if jeeName == argName {
+			return jeeLoc.ID
+		}
+	}
+	return ""
 }
