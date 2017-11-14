@@ -7,11 +7,13 @@
 [![license](https://img.shields.io/github/license/mch1307/gomotics.svg)](https://github.com/mch1307/gomotics/blob/master/LICENSE.md) [![](https://images.microbadger.com/badges/image/mch1307/gomotics.svg)](https://microbadger.com/images/mch1307/gomotics "Get your own image badge on microbadger.com")
 
 Niko Home Control - Jeedom interface in Go
-* expose API to NHC
-* interface NHC with Jeedom
+
+* expose API for interacting with NHC
+* real-time events using websocket
+* interface NHC with Jeedom (switche and dimmer)
 * automatically creates NHC items in Jeedom
 
-More information/doc on https://blog.csnet.me/gomotics/
+More information/doc on the [wiki](https://github.com/mch1307/gomotics/wiki) and on my [blog](https://blog.csnet.me/gomotics)
 
 ### See gomotics automatically creating NHC objects in Jeedom
 [![gomotics v0.4](https://i.vimeocdn.com/video/666787552.webp)](https://player.vimeo.com/video/242817325 "gomotics v0.4")
