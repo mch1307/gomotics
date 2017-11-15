@@ -71,80 +71,7 @@ func JeedomInit() {
 		missingEquipments := db.GetMissingJeedomEquipment()
 		log.Debug("missing equipments:", missingEquipments)
 		for _, eq := range missingEquipments {
-			if eq.Type == "dimmer" || eq.Type == "switch" {
-				newJeedomEq, err := CreateJeedomEquipment(db.GetJeedomLocationID(eq.Location), eq.Name)
-				if err != nil {
-					log.Warn(err)
-				}
-				if len(newJeedomEq) > 0 {
-					var stateID string
-					if eq.Type == "switch" {
-						tempCMD := makeJeedomCMDFromTemplate(eq.Type, "state")
-						if jeeCMD, ok := tempCMD.(types.JeedomSwitchStateCMD); ok {
-							jeeCMD.Apikey = config.Conf.JeedomConfig.APIKey
-							jeeCMD.EqLogicID = newJeedomEq
-							stateID, _ = CreateJeedomCMD(jeeCMD)
-							log.Debug("##################### id:", stateID)
-						}
-						tempCMD = makeJeedomCMDFromTemplate(eq.Type, "on")
-						if jeeCMD, ok := tempCMD.(types.JeedomSwitchOnOffCMD); ok {
-							jeeCMD.Apikey = config.Conf.JeedomConfig.APIKey
-							jeeCMD.Name = "on"
-							jeeCMD.EqLogicID = newJeedomEq
-							jeeCMD.Value = stateID
-							jeeCMD.Configuration.UpdateCmdID = stateID
-							jeeCMD.Configuration.Request = apiURL + "/#eqLogic_id#/100"
-							jeeCMD.Configuration.UpdateCmdToValue = "100"
-							jeeCMD.Order = "1"
-							i, _ := CreateJeedomCMD(jeeCMD)
-							log.Debug("##################### id:", i)
-							jeeCMD.Name = "off"
-							jeeCMD.Configuration.Request = apiURL + "/#eqLogic_id#/0"
-							jeeCMD.Configuration.UpdateCmdToValue = "0"
-							jeeCMD.Order = "2"
-							i, _ = CreateJeedomCMD(jeeCMD)
-							log.Debug("##################### id:", i)
-						}
-						tempCMD = makeJeedomCMDFromTemplate(eq.Type, "updState")
-						if jeeCMD, ok := tempCMD.(types.JeedomSwitchUpdStateCMD); ok {
-							jeeCMD.Apikey = config.Conf.JeedomConfig.APIKey
-							jeeCMD.EqLogicID = newJeedomEq
-							jeeCMD.Value = stateID
-							jeeCMD.Configuration.UpdateCmdID = stateID
-							i, _ := CreateJeedomCMD(jeeCMD)
-							log.Debug("##################### id:", i)
-						}
-					} else if eq.Type == "dimmer" {
-						tempCMD := makeJeedomCMDFromTemplate(eq.Type, "state")
-						if jeeCMD, ok := tempCMD.(types.JeedomDimmerStateCMD); ok {
-							jeeCMD.Apikey = config.Conf.JeedomConfig.APIKey
-							jeeCMD.EqLogicID = newJeedomEq
-							//jeeCMD.Value = stateID
-							stateID, _ = CreateJeedomCMD(jeeCMD)
-							log.Debug("##################### id:", stateID)
-						}
-						tempCMD = makeJeedomCMDFromTemplate(eq.Type, "dim")
-						if jeeCMD, ok := tempCMD.(types.JeedomDimmerDimCMD); ok {
-							jeeCMD.Apikey = config.Conf.JeedomConfig.APIKey
-							jeeCMD.EqLogicID = newJeedomEq
-							jeeCMD.Value = stateID
-							jeeCMD.Configuration.UpdateCmdID = stateID
-							jeeCMD.Configuration.Request = apiURL + "/#eqLogic_id#/#slider#"
-							i, _ := CreateJeedomCMD(jeeCMD)
-							log.Debug("##################### id:", i)
-						}
-						tempCMD = makeJeedomCMDFromTemplate(eq.Type, "updState")
-						if jeeCMD, ok := tempCMD.(types.JeedomDimmerUpdStateCMD); ok {
-							jeeCMD.Apikey = config.Conf.JeedomConfig.APIKey
-							jeeCMD.EqLogicID = newJeedomEq
-							jeeCMD.Value = stateID
-							jeeCMD.Configuration.UpdateCmdID = stateID
-							i, _ := CreateJeedomCMD(jeeCMD)
-							log.Debug("##################### id:", i)
-						}
-					}
-				}
-			}
+			createJeedomEquipment(eq)
 		}
 		initJeedomEquipments()
 		db.FillNHCItems()
@@ -152,6 +79,83 @@ func JeedomInit() {
 	} else {
 		log.Warn("Script Plugin is not installed, disabling Jeedom")
 		config.Conf.JeedomConfig.Enabled = false
+	}
+}
+
+func createJeedomEquipment(eq types.NHCItem) {
+	if eq.Type == "dimmer" || eq.Type == "switch" {
+		newJeedomEq, err := CreateJeedomEquipment(db.GetJeedomLocationID(eq.Location), eq.Name)
+		if err != nil {
+			log.Warn(err)
+		}
+		if len(newJeedomEq) > 0 {
+			var stateID string
+			if eq.Type == "switch" {
+				tempCMD := makeJeedomCMDFromTemplate(eq.Type, "state")
+				if jeeCMD, ok := tempCMD.(types.JeedomSwitchStateCMD); ok {
+					jeeCMD.Apikey = config.Conf.JeedomConfig.APIKey
+					jeeCMD.EqLogicID = newJeedomEq
+					stateID, _ = CreateJeedomCMD(jeeCMD)
+					log.Debug("##################### id:", stateID)
+				}
+				tempCMD = makeJeedomCMDFromTemplate(eq.Type, "on")
+				if jeeCMD, ok := tempCMD.(types.JeedomSwitchOnOffCMD); ok {
+					jeeCMD.Apikey = config.Conf.JeedomConfig.APIKey
+					jeeCMD.Name = "on"
+					jeeCMD.EqLogicID = newJeedomEq
+					jeeCMD.Value = stateID
+					jeeCMD.Configuration.UpdateCmdID = stateID
+					jeeCMD.Configuration.Request = apiURL + "/#eqLogic_id#/100"
+					jeeCMD.Configuration.UpdateCmdToValue = "100"
+					jeeCMD.Order = "1"
+					i, _ := CreateJeedomCMD(jeeCMD)
+					log.Debug("##################### id:", i)
+					jeeCMD.Name = "off"
+					jeeCMD.Configuration.Request = apiURL + "/#eqLogic_id#/0"
+					jeeCMD.Configuration.UpdateCmdToValue = "0"
+					jeeCMD.Order = "2"
+					i, _ = CreateJeedomCMD(jeeCMD)
+					log.Debug("##################### id:", i)
+				}
+				tempCMD = makeJeedomCMDFromTemplate(eq.Type, "updState")
+				if jeeCMD, ok := tempCMD.(types.JeedomSwitchUpdStateCMD); ok {
+					jeeCMD.Apikey = config.Conf.JeedomConfig.APIKey
+					jeeCMD.EqLogicID = newJeedomEq
+					jeeCMD.Value = stateID
+					jeeCMD.Configuration.UpdateCmdID = stateID
+					i, _ := CreateJeedomCMD(jeeCMD)
+					log.Debug("##################### id:", i)
+				}
+			} else if eq.Type == "dimmer" {
+				tempCMD := makeJeedomCMDFromTemplate(eq.Type, "state")
+				if jeeCMD, ok := tempCMD.(types.JeedomDimmerStateCMD); ok {
+					jeeCMD.Apikey = config.Conf.JeedomConfig.APIKey
+					jeeCMD.EqLogicID = newJeedomEq
+					//jeeCMD.Value = stateID
+					stateID, _ = CreateJeedomCMD(jeeCMD)
+					log.Debug("##################### id:", stateID)
+				}
+				tempCMD = makeJeedomCMDFromTemplate(eq.Type, "dim")
+				if jeeCMD, ok := tempCMD.(types.JeedomDimmerDimCMD); ok {
+					jeeCMD.Apikey = config.Conf.JeedomConfig.APIKey
+					jeeCMD.EqLogicID = newJeedomEq
+					jeeCMD.Value = stateID
+					jeeCMD.Configuration.UpdateCmdID = stateID
+					jeeCMD.Configuration.Request = apiURL + "/#eqLogic_id#/#slider#"
+					i, _ := CreateJeedomCMD(jeeCMD)
+					log.Debug("##################### id:", i)
+				}
+				tempCMD = makeJeedomCMDFromTemplate(eq.Type, "updState")
+				if jeeCMD, ok := tempCMD.(types.JeedomDimmerUpdStateCMD); ok {
+					jeeCMD.Apikey = config.Conf.JeedomConfig.APIKey
+					jeeCMD.EqLogicID = newJeedomEq
+					jeeCMD.Value = stateID
+					jeeCMD.Configuration.UpdateCmdID = stateID
+					i, _ := CreateJeedomCMD(jeeCMD)
+					log.Debug("##################### id:", i)
+				}
+			}
+		}
 	}
 }
 
