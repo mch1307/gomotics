@@ -158,7 +158,9 @@ func JeedomInit() {
 func syncJeedomItemsState() {
 	items := db.GetNHCItems()
 	for _, item := range items {
-		UpdateJeedomState(item)
+		if len(item.JeedomID) > 0 {
+			UpdateJeedomState(item)
+		}
 	}
 
 }
