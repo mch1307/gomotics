@@ -230,9 +230,9 @@ func UpdateJeedomState(item types.NHCItem) error {
 }
 
 // makeRPCArgs returns prepared Jeedom RPC basic args
-func makeRPCArgs() (rpcArgs types.JsonRpcArgs, rpcParams types.BasicRPCParams) {
+func makeRPCArgs() (rpcArgs types.JsonRpcArgs, rpcParams types.JeedomRPCParams) {
 	var args types.JsonRpcArgs
-	var params types.BasicRPCParams
+	var params types.JeedomRPCParams
 	args.Jsonrpc = "2.0"
 	args.ID = "0"
 	params.Apikey = config.Conf.JeedomConfig.APIKey
@@ -255,12 +255,12 @@ func newJeedomRPCRequest(args []byte) *http.Request {
 
 // ExecJeedomRPCRequest send JSON RPC request to Jeedom, returns raw result
 func ExecJeedomRPCRequest(args *types.JsonRpcArgs) (res []byte, err error) {
-	hcli := http.Client{Timeout: time.Second * 5}
+	hcli := http.Client{Timeout: time.Second * 2}
 	parsedArgs, err := json.Marshal(args)
 	if err != nil {
 		log.Warn(err)
 	}
-	log.Debug("sent command: ", args.Method, args.Params)
+	log.Debug("sent command: ", args.Method, string(parsedArgs))
 	req := newJeedomRPCRequest(parsedArgs)
 
 	resp, err := hcli.Do(req)

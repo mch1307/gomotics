@@ -9,25 +9,28 @@ type JeedomItem struct {
 	ID int
 }
 
+/* // JsonRpcCMDArgs JSON RPC parameters
 type JsonRpcCMDArgs struct {
 	Jsonrpc string `json:"jsonrpc"`
 	Method  string `json:"method"`
 	ID      string `json:"id"`
 	Params  interface{}
-}
+} */
 
-type BasicRPCParams struct {
+// JeedomRPCParams holds basic Jeedom JSON RPC API params
+type JeedomRPCParams struct {
 	Apikey     string `json:"apikey"`
-	Type       string `json:"type"`
-	EqLogicID  string `json:"eqLogic_id"`
-	Name       string `json:"name"`
-	Display    string `json:"display"`
-	ObjectID   string `json:"object_id"`
-	IsVisible  string `json:"isVisible"`
-	IsEnable   string `json:"isEnable"`
-	EqTypeName string `json:"eqType_name"`
+	Type       string `json:"type,omitempty"`
+	EqLogicID  string `json:"eqLogic_id,omitempty"`
+	Name       string `json:"name,omitempty"`
+	Display    string `json:"display,omitempty"`
+	ObjectID   string `json:"object_id,omitempty"`
+	IsVisible  string `json:"isVisible,omitempty"`
+	IsEnable   string `json:"isEnable,omitempty"`
+	EqTypeName string `json:"eqType_name,omitempty"`
 }
 
+// JsonRpcArgs JSON RPC parameters
 type JsonRpcArgs struct {
 	Jsonrpc string      `json:"jsonrpc"`
 	Method  string      `json:"method"`
@@ -35,12 +38,14 @@ type JsonRpcArgs struct {
 	Params  interface{} `json:"params"`
 }
 
+// JeedomObjects list of Objects (locations) returned by Jeedom
 type JeedomObjects struct {
 	Jsonrpc string           `json:"jsonrpc"`
 	ID      string           `json:"id"`
 	Result  []JeedomLocation `json:"result"`
 }
 
+// JeedomLocation Object (Location) returned by Jeedom
 type JeedomLocation struct {
 	ID            string      `json:"id"`
 	Name          string      `json:"name"`
@@ -61,12 +66,14 @@ type JeedomLocation struct {
 	} `json:"display"`
 }
 
+// JeedomEquipments list of equipment returned by Jeedom
 type JeedomEquipments struct {
 	Jsonrpc string            `json:"jsonrpc"`
 	ID      string            `json:"id"`
 	Result  []JeedomEquipment `json:"result"`
 }
 
+// JeedomEquipment returned by Equipmentjeedom
 type JeedomEquipment struct {
 	ID            string      `json:"id"`
 	Name          string      `json:"name"`
@@ -129,12 +136,14 @@ type JeedomEquipment struct {
 	Status  string      `json:"status"`
 }
 
+// JeedomCMDs list of CMDs returned by Jeedom
 type JeedomCMDs struct {
 	Jsonrpc string      `json:"jsonrpc"`
 	ID      string      `json:"id"`
 	Result  []JeedomCMD `json:"result"`
 }
 
+// JeedomCMDConfig Jeedom CMD config
 type JeedomCMDConfig struct {
 	RequestType                      string `json:"requestType"`
 	Request                          string `json:"request"`
@@ -184,6 +193,7 @@ type JeedomCMDConfig struct {
 	Value                            string `json:"value"`
 }
 
+// JeedomCMDDisplay Jeedom CMD Display options
 type JeedomCMDDisplay struct {
 	Icon                     string        `json:"icon"`
 	InvertBinary             string        `json:"invertBinary"`
@@ -207,11 +217,13 @@ type JeedomCMDDisplay struct {
 	GenericType              string        `json:"generic_type"`
 }
 
+// JeedomCMDTemplate Jeedom CMD template
 type JeedomCMDTemplate struct {
 	Dashboard string `json:"dashboard"`
 	Mobile    string `json:"mobile"`
 }
 
+// JeedomCMD Jeedom CMD
 type JeedomCMD struct {
 	Apikey        string            `json:"apikey"`
 	ID            string            `json:"id"`
@@ -234,12 +246,14 @@ type JeedomCMD struct {
 	Value         string            `json:"value"`
 }
 
+// JeedomVersion version returned by Jeedom
 type JeedomVersion struct {
 	Jsonrpc string `json:"jsonrpc"`
 	ID      string `json:"id"`
 	Result  string `json:"result"`
 }
 
+// JeedomPlugins list of installed plugins returned by Jeedom
 type JeedomPlugins struct {
 	Jsonrpc string `json:"jsonrpc"`
 	ID      string `json:"id"`
@@ -308,56 +322,7 @@ type JeedomCreateEqRsp struct {
 	} `json:"result"`
 }
 
-type JeedomCreateCmdRsp struct {
-	Jsonrpc string `json:"jsonrpc"`
-	ID      string `json:"id"`
-	Result  struct {
-		ID            string      `json:"id"`
-		LogicalID     interface{} `json:"logicalId"`
-		EqType        string      `json:"eqType"`
-		Name          string      `json:"name"`
-		Order         string      `json:"order"`
-		Type          string      `json:"type"`
-		SubType       string      `json:"subType"`
-		EqLogicID     string      `json:"eqLogic_id"`
-		IsHistorized  string      `json:"isHistorized"`
-		Unite         string      `json:"unite"`
-		Configuration struct {
-			RequestType            string `json:"requestType"`
-			Request                string `json:"request"`
-			NoSslCheck             string `json:"noSslCheck"`
-			AllowEmptyResponse     string `json:"allowEmptyResponse"`
-			DoNotReportHTTPError   string `json:"doNotReportHttpError"`
-			XMLNoSslCheck          string `json:"xmlNoSslCheck"`
-			HTMLNoSslCheck         string `json:"htmlNoSslCheck"`
-			JSONNoSslCheck         string `json:"jsonNoSslCheck"`
-			JeedomCheckCmdOperator string `json:"jeedomCheckCmdOperator"`
-		} `json:"configuration"`
-		Template struct {
-			Dashboard string `json:"dashboard"`
-			Mobile    string `json:"mobile"`
-		} `json:"template"`
-		Display struct {
-			InvertBinary          string `json:"invertBinary"`
-			ForceReturnLineBefore string `json:"forceReturnLineBefore"`
-			ForceReturnLineAfter  string `json:"forceReturnLineAfter"`
-			Parameters            string `json:"parameters"`
-			ShowOncategory        string `json:"showOncategory"`
-			ShowStatsOncategory   string `json:"showStatsOncategory"`
-			ShowNameOncategory    string `json:"showNameOncategory"`
-			ShowOnstyle           string `json:"showOnstyle"`
-			ShowStatsOnstyle      string `json:"showStatsOnstyle"`
-			ShowNameOnstyle       string `json:"showNameOnstyle"`
-		} `json:"display"`
-		HTML struct {
-			Enable string `json:"enable"`
-		} `json:"html"`
-		Value     interface{} `json:"value"`
-		IsVisible string      `json:"isVisible"`
-		Alert     interface{} `json:"alert"`
-	} `json:"result"`
-}
-
+// JeedomDimmerStateCMD struct to parse Jeedom cmd "template" from jeedomconst
 type JeedomDimmerStateCMD struct {
 	Apikey        string `json:"apikey"`
 	ID            string `json:"id"`
@@ -483,6 +448,7 @@ type JeedomDimmerStateCMD struct {
 	CurrentValue int    `json:"currentValue"`
 }
 
+// JeedomDimmerDimCMD struct to parse Jeedom cmd "template" from jeedomconst
 type JeedomDimmerDimCMD struct {
 	Apikey        string `json:"apikey"`
 	ID            string `json:"id"`
@@ -574,7 +540,7 @@ type JeedomDimmerDimCMD struct {
 	CurrentValue interface{} `json:"currentValue"`
 }
 
-// JeedomDimmerUpdStateCMD
+// JeedomDimmerUpdStateCMD struct to parse Jeedom cmd "template" from jeedomconst
 type JeedomDimmerUpdStateCMD struct {
 	Apikey        string      `json:"apikey"`
 	ID            string      `json:"id"`
@@ -634,6 +600,7 @@ type JeedomDimmerUpdStateCMD struct {
 	CurrentValue interface{} `json:"currentValue"`
 }
 
+// JeedomSwitchStateCMD struct to parse Jeedom cmd "template" from jeedomconst
 type JeedomSwitchStateCMD struct {
 	Apikey        string `json:"apikey"`
 	ID            string `json:"id"`
@@ -738,6 +705,7 @@ type JeedomSwitchStateCMD struct {
 	CurrentValue int    `json:"currentValue"`
 }
 
+// JeedomSwitchOnOffCMD struct to parse Jeedom cmd "template" from jeedomconst
 type JeedomSwitchOnOffCMD struct {
 	Apikey        string      `json:"apikey"`
 	ID            string      `json:"id"`
@@ -797,6 +765,7 @@ type JeedomSwitchOnOffCMD struct {
 	CurrentValue interface{} `json:"currentValue"`
 }
 
+// JeedomSwitchUpdStateCMD struct to parse Jeedom cmd "template" from jeedomconst
 type JeedomSwitchUpdStateCMD struct {
 	Apikey        string      `json:"apikey"`
 	ID            string      `json:"id"`
