@@ -83,7 +83,7 @@ func Initialize(cfg string) {
 	Conf.JeedomConfig.URL = coalesce(os.Getenv("JEE_URL"), Conf.JeedomConfig.URL)
 	Conf.JeedomConfig.APIKey = coalesce(os.Getenv("JEE_APIKEY"), Conf.JeedomConfig.APIKey)
 	Conf.NhcConfig.Host = coalesce(os.Getenv("NHC_HOST"), Conf.NhcConfig.Host)
-	Conf.ServerConfig.GMHostPort = coalesce(os.Getenv("GM_HOSTPORT"), Conf.ServerConfig.GMHostPort, "localhost")
+	Conf.ServerConfig.GMHostPort = coalesce(os.Getenv("GM_HOSTPORT"), Conf.ServerConfig.GMHostPort, "localhost:"+strconv.Itoa(Conf.ServerConfig.ListenPort))
 	var co = "N"
 	if Conf.JeedomConfig.AutoCreateObjects {
 		co = "Y"
