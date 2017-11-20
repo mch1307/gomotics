@@ -55,26 +55,28 @@ func JeedomInit() {
 		initJeedomLocations()
 		initJeedomEquipments()
 		db.FillNHCItems()
-		// check which locations are missing. If any, we create them in Jeedom
-		// and re-match with NHC locations
-		missingLocations := db.GetMissingJeedomObjects()
-		if len(missingLocations) > 0 {
-			log.Debug("missing locations:", missingLocations)
-			for _, n := range missingLocations {
-				_ = CreateJeedomObject(n)
+		if config.Conf.JeedomConfig.AutoCreateObjects {
+			// check which locations are missing. If any, we create them in Jeedom
+			// and re-match with NHC locations
+			missingLocations := db.GetMissingJeedomObjects()
+			if len(missingLocations) > 0 {
+				log.Debug("missing locations:", missingLocations)
+				for _, n := range missingLocations {
+					_ = CreateJeedomObject(n)
+				}
+				initJeedomLocations()
+				db.FillNHCItems()
 			}
-			initJeedomLocations()
+			// check which equipments are missing in Jeedom. If any, we create them in
+			// Jeedom with relevant cmds and re-match with NHC actions
+			missingEquipments := db.GetMissingJeedomEquipment()
+			log.Debug("missing equipments:", missingEquipments)
+			for _, eq := range missingEquipments {
+				createJeedomEquipment(eq)
+			}
+			initJeedomEquipments()
 			db.FillNHCItems()
 		}
-		// check wich equipments are missing in Jeedom. If any, we create them in
-		// Jeedom with relevant cmds and re-match with NHC actions
-		missingEquipments := db.GetMissingJeedomEquipment()
-		log.Debug("missing equipments:", missingEquipments)
-		for _, eq := range missingEquipments {
-			createJeedomEquipment(eq)
-		}
-		initJeedomEquipments()
-		db.FillNHCItems()
 		syncJeedomItemsState()
 	} else {
 		log.Warn("Script Plugin is not installed, disabling Jeedom")
