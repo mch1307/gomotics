@@ -113,13 +113,17 @@ func NhcListener() {
 	}
 
 	fmt.Fprintf(conn, RegisterCMD+"\n")
+	reader := json.NewDecoder(conn)
+	//reader := bufio.NewReader(conn)
+	//tp := textproto.NewReader(reader)
 
 	for {
-		reader := json.NewDecoder(conn)
+		//line, _ := tp.ReadLine()
+		//if err := json.Unmarshal([]byte(line), &nhcMessage); err != nil {
 		if err := reader.Decode(&nhcMessage); err != nil {
 			log.Errorf("error decoding NHC message %v", err)
 		}
-		log.Debug(nhcMessage)
+		log.Debug(string(nhcMessage.Data))
 		if nhcMessage.Cmd == "startevents" {
 			log.Info("listener registered")
 			nhcMessage.Cmd = "dropme"
