@@ -46,7 +46,7 @@ func JeedomInit() {
 		return
 	}
 	if !isJeedomVersionOK() {
-		log.Warn("Non compliant Jeedom verision")
+		log.Warn("Non compliant Jeedom version")
 		config.Conf.JeedomConfig.Enabled = false
 		return
 	}
