@@ -219,7 +219,7 @@ func UpdateJeedomState(item types.NHCItem) error {
 	curItem, _ := db.GetNHCItem(item.ID)
 	if curItem.JeedomState != strconv.Itoa(item.State) {
 
-		cli := http.Client{Timeout: time.Second * 2}
+		cli := http.Client{Timeout: time.Second * 10}
 		log.Debug("updjeedom: ", item)
 		req, _ := http.NewRequest(http.MethodGet, config.Conf.JeedomConfig.URL, nil)
 		qry := req.URL.Query()
@@ -263,7 +263,7 @@ func newJeedomRPCRequest(args []byte) *http.Request {
 
 // ExecJeedomRPCRequest send JSON RPC request to Jeedom, returns raw result
 func ExecJeedomRPCRequest(args *types.JsonRpcArgs) (res []byte, err error) {
-	hcli := http.Client{Timeout: time.Second * 2}
+	hcli := http.Client{Timeout: time.Second * 10}
 	parsedArgs, err := json.Marshal(args)
 	if err != nil {
 		log.Warn(err)
